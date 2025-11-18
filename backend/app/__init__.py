@@ -1,9 +1,7 @@
 """
 Zephyr Analytics Backend Application
+
+An analytics platform for tracking and analyzing client-side events.
 """
+
 __author__ = "asinthelol"
-
-# Import main components for easier access
-from app.main import app
-
-__all__ = ["app"]

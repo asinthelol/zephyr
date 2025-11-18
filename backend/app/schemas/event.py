@@ -15,7 +15,7 @@ class EventBase(BaseModel):
     user_agent: str = Field(..., description="User agent string")
     viewport_width: Optional[int] = Field(None, description="Browser viewport width")
     viewport_height: Optional[int] = Field(None, description="Browser viewport height")
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional event metadata")
+    event_metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional event metadata")
 
 
 class EventCreate(EventBase):
