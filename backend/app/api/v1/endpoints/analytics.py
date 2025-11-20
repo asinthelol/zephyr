@@ -26,6 +26,7 @@ def get_overview(
     """
     Get overview analytics with total counts
     """
+    
     query = db.query(Event)
     
     if start_date:
@@ -60,6 +61,7 @@ def get_events_analytics(
     """
     Get event analytics grouped by time period
     """
+    
     query = db.query(Event)
     
     if start_date:
@@ -89,6 +91,7 @@ def get_sessions_analytics(
     """
     Get session analytics
     """
+    
     query = db.query(SessionModel)
     
     if start_date:

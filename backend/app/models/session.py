@@ -2,7 +2,7 @@
 Session model for tracking user sessions
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -16,8 +16,8 @@ class Session(Base):
     id = Column(Integer, primary_key=True, index=True)
     session_id = Column(String(255), unique=True, nullable=False, index=True)
     user_id = Column(String(255), ForeignKey("users.user_id"), nullable=True, index=True)
-    started_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
-    last_activity = Column(DateTime, default=datetime.utcnow, nullable=False)
+    started_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
+    last_activity = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     ended_at = Column(DateTime, nullable=True)
     page_views = Column(Integer, default=0, nullable=False)
     duration = Column(Integer, nullable=True)  # Duration in seconds

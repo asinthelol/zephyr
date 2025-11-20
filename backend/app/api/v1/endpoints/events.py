@@ -5,9 +5,12 @@ Event tracking endpoints
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import get_db
 from app.models.event import Event
+from app.models.session import Session as SessionModel
+from app.models.user import User
 from app.schemas.event import EventCreate, EventResponse
 
 router = APIRouter()
@@ -21,6 +24,23 @@ def create_event(
     """
     Create a new event
     """
+    
+    # Validate foreign keys exist
+    session_obj = db.query(SessionModel).filter(SessionModel.session_id == event.session_id).first()
+    if not session_obj:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session '{event.session_id}' does not exist"
+        )
+    
+    if event.user_id is not None:
+        user_obj = db.query(User).filter(User.user_id == event.user_id).first()
+        if not user_obj:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"User '{event.user_id}' does not exist"
+            )
+    
     db_event = Event(
         event_type=event.event_type,
         url=event.url,
@@ -33,7 +53,16 @@ def create_event(
         user_id=event.user_id
     )
     db.add(db_event)
-    db.commit()
+    
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database integrity error"
+        )
+    
     db.refresh(db_event)
     return db_event
 
@@ -47,6 +76,7 @@ def get_events(
     """
     Get list of events
     """
+    
     events = db.query(Event).offset(skip).limit(limit).all()
     return events
 
@@ -59,6 +89,7 @@ def get_event(
     """
     Get a specific event by ID
     """
+    
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
         raise HTTPException(

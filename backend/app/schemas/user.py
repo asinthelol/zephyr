@@ -2,7 +2,7 @@
 User tracking schemas
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -17,7 +17,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """Schema for creating new users"""
-    first_seen: datetime = Field(default_factory=datetime.utcnow, description="First time user was seen")
+    first_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="First time user was seen")
 
 
 class UserResponse(UserBase):
