@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
+from app.utils.validators import validate_user_id, validate_ip_address, sanitize_string
 
 router = APIRouter()
 
@@ -21,6 +22,21 @@ def create_user(
     """
     Create a new user
     """
+    
+    # Validate user_id format
+    if not validate_user_id(user.user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format"
+        )
+    
+    # Validate IP address if provided
+    if user.ip_address and not validate_ip_address(user.ip_address):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid IP address format"
+        )
+    
     # Check if user already exists
     existing_user = db.query(User).filter(User.user_id == user.user_id).first()
     if existing_user:
@@ -32,8 +48,8 @@ def create_user(
     db_user = User(
         user_id=user.user_id,
         ip_address=user.ip_address,
-        country=user.country,
-        city=user.city,
+        country=sanitize_string(user.country, max_length=100),
+        city=sanitize_string(user.city, max_length=100),
         first_seen=user.first_seen
     )
     db.add(db_user)
@@ -51,6 +67,7 @@ def get_users(
     """
     Get list of users
     """
+    
     users = db.query(User).offset(skip).limit(limit).all()
     return users
 
@@ -63,6 +80,7 @@ def get_user(
     """
     Get a specific user by user_id
     """
+    
     user = db.query(User).filter(User.user_id == user_id).first()
     if not user:
         raise HTTPException(

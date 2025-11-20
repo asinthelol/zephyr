@@ -5,13 +5,11 @@ Event tracking endpoints
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import get_db
 from app.models.event import Event
-from app.models.session import Session as SessionModel
-from app.models.user import User
 from app.schemas.event import EventCreate, EventResponse
+from app.services.event_service import EventService
 
 router = APIRouter()
 
@@ -22,49 +20,22 @@ def create_event(
     db: Session = Depends(get_db)
 ):
     """
-    Create a new event
+    Create a new event with enriched data (browser, OS, device type)
     """
     
-    # Validate foreign keys exist
-    session_obj = db.query(SessionModel).filter(SessionModel.session_id == event.session_id).first()
-    if not session_obj:
+    try:
+        db_event = EventService.create_event(db, event)
+        return db_event
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Session '{event.session_id}' does not exist"
+            detail=str(e)
         )
-    
-    if event.user_id is not None:
-        user_obj = db.query(User).filter(User.user_id == event.user_id).first()
-        if not user_obj:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"User '{event.user_id}' does not exist"
-            )
-    
-    db_event = Event(
-        event_type=event.event_type,
-        url=event.url,
-        referrer=event.referrer,
-        user_agent=event.user_agent,
-        viewport_width=event.viewport_width,
-        viewport_height=event.viewport_height,
-        event_metadata=event.event_metadata,
-        session_id=event.session_id,
-        user_id=event.user_id
-    )
-    db.add(db_event)
-    
-    try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database integrity error"
+            detail=f"Error creating event: {str(e)}"
         )
-    
-    db.refresh(db_event)
-    return db_event
 
 
 @router.get("/", response_model=List[EventResponse])

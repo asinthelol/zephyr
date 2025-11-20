@@ -2,15 +2,16 @@
 Session management endpoints
 """
 
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import get_db
 from app.models.session import Session as SessionModel
 from app.models.user import User
 from app.schemas.session import SessionCreate, SessionResponse
+from app.services.session_service import SessionService
+from app.utils.validators import validate_session_id
 
 router = APIRouter()
 
@@ -23,8 +24,14 @@ def create_session(
     """
     Create a new session
     """
+    # Validate session ID format
+    if not validate_session_id(session.session_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid session ID format"
+        )
     
-    # Validate foreign key exists if user_id is provided
+    # Validate user exists if user_id provided
     if session.user_id is not None:
         user_obj = db.query(User).filter(User.user_id == session.user_id).first()
         if not user_obj:
@@ -33,24 +40,19 @@ def create_session(
                 detail=f"User '{session.user_id}' does not exist"
             )
     
-    db_session = SessionModel(
-        session_id=session.session_id,
-        user_id=session.user_id,
-        started_at=session.started_at
-    )
-    db.add(db_session)
-    
     try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
+        db_session = SessionService.create_session(
+            db,
+            session.session_id,
+            session.user_id,
+            session.started_at
+        )
+        return db_session
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database integrity error"
+            detail=f"Error creating session: {str(e)}"
         )
-    
-    db.refresh(db_session)
-    return db_session
 
 
 @router.get("/", response_model=List[SessionResponse])
@@ -83,3 +85,43 @@ def get_session(
             detail="Session not found"
         )
     return session
+
+
+@router.put("/{session_id}/end", response_model=SessionResponse)
+def end_session(
+    session_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    End a session and calculate its duration
+    """
+    
+    try:
+        session = SessionService.end_session(db, session_id)
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Session not found"
+            )
+        return session
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error ending session: {str(e)}"
+        )
+
+
+@router.get("/active/count")
+def get_active_sessions_count(db: Session = Depends(get_db)):
+    """
+    Get count of currently active sessions (not timed out)
+    """
+    
+    try:
+        count = SessionService.get_active_sessions_count(db)
+        return {"active_sessions": count}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting active sessions: {str(e)}"
+        )

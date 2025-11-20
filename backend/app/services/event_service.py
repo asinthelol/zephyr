@@ -31,11 +31,20 @@ class EventService:
         # Parse user agent if present
         if "user_agent" in enriched and enriched["user_agent"]:
             ua_info = parse_user_agent(enriched["user_agent"])
-            enriched["browser"] = ua_info.get("browser")
-            enriched["browser_version"] = ua_info.get("browser_version")
-            enriched["os"] = ua_info.get("os")
-            enriched["os_version"] = ua_info.get("os_version")
-            enriched["device_type"] = ua_info.get("device_type")
+            
+            # Get existing metadata or create new dict
+            metadata = enriched.get("event_metadata", {})
+            
+            # Add parsed user agent info to metadata
+            metadata.update({
+                "browser": ua_info.get("browser"),
+                "browser_version": ua_info.get("browser_version"),
+                "os": ua_info.get("os"),
+                "os_version": ua_info.get("os_version"),
+                "device_type": ua_info.get("device_type")
+            })
+            
+            enriched["event_metadata"] = metadata
         
         # Sanitize string fields
         if "url" in enriched:
@@ -79,6 +88,16 @@ class EventService:
         is_valid, error_msg = EventService.validate_event(event_data)
         if not is_valid:
             raise ValueError(error_msg)
+        
+        # Validate foreign keys exist
+        session_obj = db.query(SessionModel).filter(SessionModel.session_id == event_data.session_id).first()
+        if not session_obj:
+            raise ValueError(f"Session '{event_data.session_id}' does not exist")
+        
+        if event_data.user_id is not None:
+            user_obj = db.query(User).filter(User.user_id == event_data.user_id).first()
+            if not user_obj:
+                raise ValueError(f"User '{event_data.user_id}' does not exist")
         
         # Convert to dict and enrich
         event_dict = event_data.model_dump()

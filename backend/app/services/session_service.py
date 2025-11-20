@@ -16,7 +16,7 @@ class SessionService:
     SESSION_TIMEOUT_MINUTES = 30
     
     @staticmethod
-    def create_session(db: DBSession, session_id: str, user_id: str, started_at: Optional[datetime] = None) -> SessionModel:
+    def create_session(db: DBSession, session_id: str, user_id: Optional[str] = None, started_at: Optional[datetime] = None) -> SessionModel:
         """
         Create a new session
         """
@@ -36,11 +36,12 @@ class SessionService:
         db.commit()
         db.refresh(db_session)
         
-        # Update user's total sessions
-        user = db.query(User).filter(User.user_id == user_id).first()
-        if user:
-            user.total_sessions = (user.total_sessions or 0) + 1
-            db.commit()
+        # Update user's total sessions if user_id provided
+        if user_id is not None:
+            user = db.query(User).filter(User.user_id == user_id).first()
+            if user:
+                user.total_sessions = (user.total_sessions or 0) + 1
+                db.commit()
         
         return db_session
     

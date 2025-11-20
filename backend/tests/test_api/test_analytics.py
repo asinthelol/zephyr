@@ -19,7 +19,7 @@ def test_get_analytics_overview(client, sample_user_data, sample_session_data, s
     data = response.json()
     assert data["metric"] == "overview"
     assert len(data["data"]) == 3  # events, sessions, users
-    assert data["total"] >= 0
+    assert data["total"] >= 1  # At least 1 event created
 
 
 def test_get_events_analytics(client, sample_user_data, sample_session_data, sample_event_data):
@@ -28,7 +28,9 @@ def test_get_events_analytics(client, sample_user_data, sample_session_data, sam
     # Create test data
     client.post("/api/users/", json=sample_user_data)
     client.post("/api/sessions/", json=sample_session_data)
-    client.post("/api/events/", json=sample_event_data)
+    event_response = client.post("/api/events/", json=sample_event_data)
+    print(f"Event creation response: {event_response.status_code}, {event_response.json()}")
+    assert event_response.status_code == 201, f"Failed to create event: {event_response.json()}"
     
     # Get events analytics
     response = client.get("/api/analytics/events")
