@@ -4,7 +4,7 @@ Session tracking schemas
 
 from datetime import datetime, timezone
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SessionBase(BaseModel):
@@ -26,5 +26,4 @@ class SessionResponse(SessionBase):
     page_views: int = Field(0, description="Number of page views in session")
     duration: Optional[int] = Field(None, description="Session duration in seconds")
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

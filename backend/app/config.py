@@ -3,7 +3,8 @@ Configuration settings for Zephyr Analytics Backend
 """
 
 from os.path import dirname, join
-from typing import List
+from typing import List, ClassVar
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 dotenv_path = join(dirname(__file__), '..', '.env')
@@ -27,9 +28,8 @@ class Settings(BaseSettings):
     # API
     API_PREFIX: str = "/api"
     
-    class Config:
-        env_file = dotenv_path
-        case_sensitive = True
+    env_file: ClassVar[str] = dotenv_path
+    case_sensitive: ClassVar[bool] = True
 
 
 settings = Settings()

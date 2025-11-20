@@ -126,7 +126,7 @@ def get_events_by_type(
 
 @router.get("/events/timeline")
 def get_events_timeline(
-    interval: str = Query("day", regex="^(hour|day|week|month)$"),
+    interval: str = Query("day", pattern="^(hour|day|week|month)$"),
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
     db: Session = Depends(get_db)

@@ -4,7 +4,7 @@ Analytics query and response schemas
 
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AnalyticsQuery(BaseModel):
@@ -31,5 +31,4 @@ class AnalyticsResponse(BaseModel):
     end_date: Optional[datetime] = None
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

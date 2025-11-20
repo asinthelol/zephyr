@@ -4,7 +4,7 @@ User tracking schemas
 
 from datetime import datetime, timezone
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
@@ -28,5 +28,4 @@ class UserResponse(UserBase):
     total_sessions: int = Field(0, description="Total number of sessions")
     total_page_views: int = Field(0, description="Total number of page views")
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
