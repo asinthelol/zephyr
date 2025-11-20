@@ -3,7 +3,7 @@ Session management service
 """
 
 from datetime import datetime, timedelta, timezone
-from typing import Optional, List
+from typing import Optional
 from sqlalchemy.orm import Session as DBSession
 
 from app.models import Session as SessionModel, User, Event

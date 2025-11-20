@@ -2,7 +2,7 @@
 Analytics aggregation and calculation service
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List, Optional, Any
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import Session

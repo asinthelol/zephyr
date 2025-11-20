@@ -4,7 +4,6 @@ Configuration settings for Zephyr Analytics Backend
 
 from os.path import dirname, join
 from typing import List, ClassVar
-from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 dotenv_path = join(dirname(__file__), '..', '.env')
