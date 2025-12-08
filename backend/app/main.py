@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+
 from app.config import settings
+from app.core.cors import setup_cors
 from app.api.v1.router import api_router
 
 app = FastAPI(
@@ -9,16 +10,10 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Setup CORS
+setup_cors(app)
 
-
-
+# Include API router
 app.include_router(api_router, prefix=settings.API_PREFIX)
 
 @app.get("/")
