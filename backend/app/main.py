@@ -3,12 +3,16 @@ import uvicorn
 
 from app.config import settings
 from app.core.cors import setup_cors
+from app.core.middleware import setup_middleware
 from app.api.v1.router import api_router
 
 app = FastAPI(
     title=settings.APP_NAME,
     debug=settings.DEBUG,
 )
+
+# Setup middleware
+setup_middleware(app)
 
 # Setup CORS
 setup_cors(app)
