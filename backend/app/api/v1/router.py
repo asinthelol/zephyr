@@ -4,7 +4,7 @@ API v1 Router - Aggregates all v1 endpoints
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import events, sessions, users, analytics
+from app.api.v1.endpoints import events, sessions, users, analytics, api_keys
 
 api_router = APIRouter()
 
@@ -30,4 +30,10 @@ api_router.include_router(
     analytics.router,
     prefix="/analytics",
     tags=["analytics"]
+)
+
+api_router.include_router(
+    api_keys.router,
+    prefix="/api-keys",
+    tags=["api-keys"]
 )

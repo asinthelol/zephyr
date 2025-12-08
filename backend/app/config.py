@@ -2,23 +2,30 @@
 Configuration settings for Zephyr Analytics Backend
 """
 
-from os.path import dirname, join
-from typing import List, ClassVar
-from pydantic_settings import BaseSettings
+from typing import List
+from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-dotenv_path = join(dirname(__file__), '..', '.env')
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = BASE_DIR / ".env"
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
+    
+    model_config = SettingsConfigDict(
+        env_file=ENV_PATH,
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+    )
     
     # App Settings
     APP_NAME: str = "Zephyr Analytics"
     DEBUG: bool = False
     
-    # Database
+    # Database (defaults to this if not in env)
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/test"
     
-    # CORS
+    # CORS``
     CORS_ORIGINS: List[str] = ["*"]
     
     # Security
@@ -26,9 +33,5 @@ class Settings(BaseSettings):
     
     # API
     API_PREFIX: str = "/api"
-    
-    env_file: ClassVar[str] = dotenv_path
-    case_sensitive: ClassVar[bool] = True
-
 
 settings = Settings()

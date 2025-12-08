@@ -9,9 +9,11 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.models.session import Session as SessionModel
 from app.models.user import User
+from app.models.api_key import APIKey
 from app.schemas.session import SessionCreate, SessionResponse
 from app.services.session_service import SessionService
 from app.utils.validators import validate_session_id
+from app.core.security import validate_api_key
 
 router = APIRouter()
 
@@ -19,10 +21,12 @@ router = APIRouter()
 @router.post("/", response_model=SessionResponse, status_code=status.HTTP_201_CREATED)
 def create_session(
     session: SessionCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: APIKey = Depends(validate_api_key)
 ):
     """
     Create a new session
+    Requires valid API key in X-API-Key header.
     """
     # Validate session ID format
     if not validate_session_id(session.session_id):

@@ -8,8 +8,10 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.event import Event
+from app.models.api_key import APIKey
 from app.schemas.event import EventCreate, EventResponse
 from app.services.event_service import EventService
+from app.core.security import validate_api_key
 
 router = APIRouter()
 
@@ -17,10 +19,12 @@ router = APIRouter()
 @router.post("/", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
 def create_event(
     event: EventCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: APIKey = Depends(validate_api_key)
 ):
     """
     Create a new event with enriched data (browser, OS, device type)
+    Requires valid API key in X-API-Key header.
     """
     
     try:
