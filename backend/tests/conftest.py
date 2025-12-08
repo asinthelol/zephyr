@@ -41,7 +41,7 @@ def db_session():
     # Import here after environment variable is set to override default database
     from app.database import Base
     import app.database
-    from app.models import Event, Session, User  # Import models to register with Base
+    from app.models import Event, Session, User, APIKey  # Import models to register with Base
     
     # Replace app's database engine with test engine
     app.database.engine = engine
@@ -69,6 +69,17 @@ def client(db_session):
     # Import here to use test database
     from app.main import app as fastapi_app
     from app.database import get_db
+    from app.core.security import validate_api_key
+    from app.models.api_key import APIKey
+    
+    # Create a test API key
+    test_api_key = APIKey(
+        key="test-api-key-123",
+        name="Test API Key",
+        is_active=True
+    )
+    db_session.add(test_api_key)
+    db_session.commit()
     
     def override_get_db():
         try:
@@ -76,9 +87,18 @@ def client(db_session):
         finally:
             pass
     
+    # Override API key validation to always return the test API key
+    async def override_validate_api_key():
+        return test_api_key
+    
     fastapi_app.dependency_overrides[get_db] = override_get_db
+    fastapi_app.dependency_overrides[validate_api_key] = override_validate_api_key
+    
     with TestClient(fastapi_app) as test_client:
+        # Set default API key header for all requests
+        test_client.headers = {"X-API-Key": "test-api-key-123"}
         yield test_client
+    
     fastapi_app.dependency_overrides.clear()
 
 
@@ -121,3 +141,9 @@ def sample_event_data():
         "session_id": "test-session-456",
         "user_id": "test-user-123"
     }
+
+
+@pytest.fixture
+def test_api_key():
+    """Test API key value"""
+    return "test-api-key-123"
