@@ -138,7 +138,7 @@ export function isBrowser(): boolean {
 export function isDoNotTrackEnabled(): boolean {
   if (!isBrowser()) return false;
 
-  const dnt = navigator.doNotTrack || (window as any).doNotTrack;
+  const dnt = navigator.doNotTrack || (window as unknown as { doNotTrack?: string }).doNotTrack;
   return dnt === '1' || dnt === 'yes';
 }
 
@@ -203,6 +203,7 @@ export class Logger {
 
   public log(...args: unknown[]): void {
     if (this.debug) {
+      // eslint-disable-next-line no-console
       console.log(this.prefix, ...args);
     }
   }

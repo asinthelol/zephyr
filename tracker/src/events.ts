@@ -169,6 +169,7 @@ export class EventTracker {
    */
   private log(...args: unknown[]): void {
     if (this.debug) {
+      // eslint-disable-next-line no-console
       console.log('[Zephyr Events]', ...args);
     }
   }
