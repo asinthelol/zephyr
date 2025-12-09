@@ -35,14 +35,19 @@ def create_session(
             detail="Invalid session ID format"
         )
     
-    # Validate user exists if user_id provided
+    # Create user if it doesn't exist
     if session.user_id is not None:
         user_obj = db.query(User).filter(User.user_id == session.user_id).first()
         if not user_obj:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"User '{session.user_id}' does not exist"
+            # Auto-create user on first session
+            user_obj = User(
+                user_id=session.user_id,
+                first_seen=session.started_at,
+                last_seen=session.started_at
             )
+            db.add(user_obj)
+            db.commit()
+            db.refresh(user_obj)
     
     try:
         db_session = SessionService.create_session(
@@ -53,9 +58,12 @@ def create_session(
         )
         return db_session
     except Exception as e:
+        import traceback
+        error_detail = f"Error creating session: {str(e)}\n{traceback.format_exc()}"
+        print(error_detail)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating session: {str(e)}"
+            detail=error_detail
         )
 
 

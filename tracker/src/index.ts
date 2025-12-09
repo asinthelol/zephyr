@@ -56,28 +56,35 @@ class ZephyrTracker {
     // Initialize event tracker
     this.eventTracker = new EventTracker(this.config.apiUrl, this.config.apiKey, this.config.debug);
 
-    this.init();
+    // Start initialization
+    this.init().catch(error => {
+      this.logger.error('Initialization error:', error);
+    });
   }
 
   /**
    * Initialize the tracker
    */
-  private init(): void {
+  private async init(): Promise<void> {
     this.logger.log('Initializing Zephyr Tracker');
 
     // Initialize session
-    const sessionId = this.sessionManager.initSession();
-    this.logger.log('Session initialized:', sessionId);
+    const { sessionId, isNew } = this.sessionManager.initSession();
+    this.logger.log('Session initialized:', sessionId, 'isNew:', isNew);
 
     // Get or create user ID
     this.initUser();
 
-    // Send session to backend
-    this.sendSession();
+    // Send session to backend only if it's a new session
+    if (isNew) {
+      this.logger.log('Sending new session to backend');
+      await this.sendSession();
+    }
 
     // Track initial page view if enabled
     if (this.config.trackPageViews) {
-      this.trackPageView();
+      this.logger.log('Tracking initial page view');
+      await this.trackPageView();
     }
 
     // Set up click tracking if enabled
@@ -124,28 +131,28 @@ class ZephyrTracker {
   /**
    * Track a page view
    */
-  public trackPageView(): void {
+  public async trackPageView(): Promise<void> {
     const sessionId = this.sessionManager.getSessionId();
     if (!sessionId) {
       this.logger.warn('No session ID, cannot track page view');
       return;
     }
 
-    this.eventTracker.trackPageView(sessionId, this.userId || undefined);
+    await this.eventTracker.trackPageView(sessionId, this.userId || undefined);
     this.sessionManager.updateExpiry();
   }
 
   /**
    * Track a custom event
    */
-  public track(eventType: string, metadata?: Record<string, unknown>): void {
+  public async track(eventType: string, metadata?: Record<string, unknown>): Promise<void> {
     const sessionId = this.sessionManager.getSessionId();
     if (!sessionId) {
       this.logger.warn('No session ID, cannot track event');
       return;
     }
 
-    this.eventTracker.track(eventType, sessionId, this.userId || undefined, metadata);
+    await this.eventTracker.track(eventType, sessionId, this.userId || undefined, metadata);
     this.sessionManager.updateExpiry(); // Keep session alive
   }
 

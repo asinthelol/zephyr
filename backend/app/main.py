@@ -18,7 +18,7 @@ setup_middleware(app)
 setup_cors(app)
 
 # Include API router
-app.include_router(api_router, prefix=settings.API_PREFIX)
+app.include_router(api_router, prefix=f"{settings.API_PREFIX}/v1")
 
 @app.get("/")
 async def read_root():

@@ -25,7 +25,7 @@ export class SessionManager {
   /**
    * Initialize or retrieve session
    */
-  public initSession(): string {
+  public initSession(): { sessionId: string; isNew: boolean } {
     const stored = StorageManager.get<{ sessionId: string; expiresAt: string }>(
       this.storageKey
     );
@@ -37,14 +37,14 @@ export class SessionManager {
       if (Date.now() < expiresAt) {
         this.sessionId = stored.sessionId;
         this.updateExpiry();
-        return this.sessionId!; // we just assigned it
+        return { sessionId: this.sessionId!, isNew: false };
       }
     }
 
     // Create new session
     this.sessionId = this.generateSessionId();
     this.updateExpiry();
-    return this.sessionId!; // generateSessionId() always returns string
+    return { sessionId: this.sessionId!, isNew: true };
   }
 
   /**
