@@ -3,6 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
@@ -12,13 +13,14 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
+    '^.+\\.ts$': ['ts-jest', {
       tsconfig: {
         esModuleInterop: true,
       },
-    },
+    }],
+  },
+  testEnvironmentOptions: {
+    url: 'https://example.com/test?param=value',
+    customExportConditions: [''],
   },
 };
