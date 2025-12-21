@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class EventBase(BaseModel):
     """Base event schema"""
+    
     event_type: str = Field(..., description="Type of event (pageview, click, etc.)")
     url: str = Field(..., description="Page URL where event occurred")
     referrer: Optional[str] = Field(None, description="Referrer URL")
@@ -20,15 +21,18 @@ class EventBase(BaseModel):
 
 class EventCreate(EventBase):
     """Schema for creating new events"""
+    
     session_id: str = Field(..., description="Session identifier")
     user_id: Optional[str] = Field(None, description="User identifier")
 
 
 class EventResponse(EventBase):
     """Schema for event responses"""
+    
     id: int
     session_id: str
     user_id: Optional[str]
+    channel: Optional[str] = Field(None, description="Traffic channel (direct, organic_search, social, referral, unknown)")
     timestamp: datetime
     
     model_config = ConfigDict(from_attributes=True)

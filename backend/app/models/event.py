@@ -14,6 +14,7 @@ class Event(Base):
     event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     url: Mapped[str] = mapped_column(Text, nullable=False)
     referrer: Mapped[str | None] = mapped_column(Text, nullable=True)
+    channel: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
     user_agent: Mapped[str] = mapped_column(Text, nullable=False)
 
     viewport_width: Mapped[int | None] = mapped_column(Integer, nullable=True)

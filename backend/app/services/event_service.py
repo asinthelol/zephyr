@@ -10,6 +10,7 @@ from app.models import Event, User, Session as SessionModel
 from app.schemas.event import EventCreate
 from app.utils.user_agent import parse_user_agent
 from app.utils.validators import sanitize_string, validate_url
+from app.utils.channel_classifier import classify_channel
 
 
 class EventService:
@@ -52,6 +53,14 @@ class EventService:
         
         if "referrer" in enriched:
             enriched["referrer"] = sanitize_string(enriched["referrer"], max_length=2048)
+        
+        # Classify traffic channel
+        if "url" in enriched and enriched["url"]:
+            channel = classify_channel(
+                enriched.get("referrer"),
+                enriched["url"]
+            )
+            enriched["channel"] = channel
         
         return enriched
     

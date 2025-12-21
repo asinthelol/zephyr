@@ -277,3 +277,34 @@ class AnalyticsService:
         bounced_sessions = query.filter(SessionModel.page_views <= 1).count()
         
         return (bounced_sessions / total_sessions) * 100
+    
+    @staticmethod
+    def get_traffic_by_channel(
+        db: Session,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Get traffic counts grouped by channel (direct, organic_search, social, referral, unknown)
+        """
+        
+        query = db.query(
+            Event.channel,
+            func.count(distinct(Event.user_id)).label("users"),
+            func.count(Event.id).label("events")
+        ).filter(
+            Event.channel.isnot(None)
+        ).group_by(Event.channel).order_by(func.count(distinct(Event.user_id)).desc())
+        
+        query = AnalyticsService._apply_date_filters(query, start_date, end_date, Event.timestamp)
+        
+        results = query.all()
+        
+        return [
+            {
+                "channel": channel or "unknown",
+                "users": users,
+                "events": events
+            }
+            for channel, users, events in results
+        ]

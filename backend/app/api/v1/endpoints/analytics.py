@@ -292,3 +292,27 @@ def get_bounce_rate(
             status_code=500,
             detail=f"Error getting bounce rate: {str(e)}"
         )
+
+
+@router.get("/traffic/channel")
+def get_traffic_by_channel(
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get traffic distribution by channel (direct, organic_search, social, referral, unknown)
+    """
+    
+    try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
+        traffic = AnalyticsService.get_traffic_by_channel(db, start_date, end_date)
+        return {"traffic": traffic}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting traffic by channel: {str(e)}"
+        )
