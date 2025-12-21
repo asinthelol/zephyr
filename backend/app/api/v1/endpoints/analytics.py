@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.schemas.analytics import AnalyticsResponse, MetricData
 from app.services.analytics_service import AnalyticsService
+from app.utils.time_ranges import get_time_range, get_available_ranges
 
 router = APIRouter()
 
@@ -18,6 +19,7 @@ router = APIRouter()
 def get_overview(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range (30m, 1h, 24h, today, yesterday, 7d, 30d, etc.)"),
     db: Session = Depends(get_db)
 ):
     """
@@ -25,6 +27,10 @@ def get_overview(
     """
     
     try:
+        # Use time_range if provided, otherwise use start_date/end_date
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         stats = AnalyticsService.get_overview_stats(db, start_date, end_date)
         return {
             "metric": "overview",
@@ -48,6 +54,7 @@ def get_overview(
 def get_events_analytics(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -55,6 +62,9 @@ def get_events_analytics(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         stats = AnalyticsService.get_overview_stats(db, start_date, end_date)
         return {
             "metric": "events",
@@ -74,6 +84,7 @@ def get_events_analytics(
 def get_sessions_analytics(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -81,10 +92,13 @@ def get_sessions_analytics(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         stats = AnalyticsService.get_overview_stats(db, start_date, end_date)
         avg_duration = stats.get("avg_session_duration", 0)
         total_sessions = stats["total_sessions"]
-        avg_page_views = 0  # Calculate if needed
+        avg_page_views = stats.get("avg_pages_per_session", 0)
         
         return {
             "metric": "sessions",
@@ -108,6 +122,7 @@ def get_sessions_analytics(
 def get_events_by_type(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -115,6 +130,9 @@ def get_events_by_type(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         events = AnalyticsService.get_events_by_type(db, start_date, end_date)
         return {"events": events}
     except Exception as e:
@@ -129,6 +147,7 @@ def get_events_timeline(
     interval: str = Query("day", pattern="^(hour|day|week|month)$"),
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -136,6 +155,9 @@ def get_events_timeline(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         timeline = AnalyticsService.get_events_timeline(db, interval, start_date, end_date)
         return {"timeline": timeline, "interval": interval}
     except Exception as e:
@@ -150,6 +172,7 @@ def get_top_pages(
     limit: int = Query(10, ge=1, le=100),
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -157,6 +180,9 @@ def get_top_pages(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         pages = AnalyticsService.get_top_pages(db, limit, start_date, end_date)
         return {"pages": pages}
     except Exception as e:
@@ -170,6 +196,7 @@ def get_top_pages(
 def get_traffic_by_device(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -177,6 +204,9 @@ def get_traffic_by_device(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         traffic = AnalyticsService.get_traffic_by_device(db, start_date, end_date)
         return {"traffic": traffic}
     except Exception as e:
@@ -190,6 +220,7 @@ def get_traffic_by_device(
 def get_traffic_by_browser(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -198,6 +229,9 @@ def get_traffic_by_browser(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         traffic = AnalyticsService.get_traffic_by_browser(db, start_date, end_date)
         return {"traffic": traffic}
     except Exception as e:
@@ -212,6 +246,7 @@ def get_traffic_by_location(
     limit: int = Query(10, ge=1, le=100),
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -219,6 +254,9 @@ def get_traffic_by_location(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         traffic = AnalyticsService.get_traffic_by_location(db, limit, start_date, end_date)
         return {"traffic": traffic}
     except Exception as e:
@@ -232,6 +270,7 @@ def get_traffic_by_location(
 def get_bounce_rate(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
     db: Session = Depends(get_db)
 ):
     """
@@ -239,6 +278,9 @@ def get_bounce_rate(
     """
     
     try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
         bounce_rate = AnalyticsService.get_bounce_rate(db, start_date, end_date)
         return {
             "bounce_rate": bounce_rate,

@@ -65,6 +65,12 @@ class AnalyticsService:
         ).filter(SessionModel.duration.isnot(None)).scalar()
         avg_session_duration = float(avg_duration_result) if avg_duration_result else 0
         
+        # Average pages per session
+        avg_pages_result = session_query.with_entities(
+            func.avg(SessionModel.page_views)
+        ).filter(SessionModel.page_views > 0).scalar()
+        avg_pages_per_session = float(avg_pages_result) if avg_pages_result else 0
+        
         return {
             "total_events": total_events,
             "total_sessions": total_sessions,
@@ -72,6 +78,7 @@ class AnalyticsService:
             "unique_visitors": unique_visitors,
             "page_views": page_views,
             "avg_session_duration": avg_session_duration,
+            "avg_pages_per_session": avg_pages_per_session,
         }
     
     @staticmethod
