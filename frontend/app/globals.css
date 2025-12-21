@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Analytics colors */
+  --card-bg: #222121;
+  --analytics-item-bg: #6C708B;
+  --text-primary: #FDFDFD;
+  --text-muted: rgba(253, 253, 253, 0.5);
+  --positive: #00C951;
 }
 
 @theme inline {
@@ -10,6 +17,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom analytics colors */
+  --color-card-bg: var(--card-bg);
+  --color-analytics-item-bg: var(--analytics-item-bg);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-positive: var(--positive);
 }
 
 @media (prefers-color-scheme: dark) {

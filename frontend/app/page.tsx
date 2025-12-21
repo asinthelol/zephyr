@@ -2,6 +2,11 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
+import { AnalyticsItem } from '@/shared/components/AnalyticsItem';
+import { BrandIcon } from '@/shared/components/BrandIcon';
+import { CountryFlag } from '@/shared/components/CountryFlag';
+import { AnalyticsHeader } from '@/shared/components/AnalyticsHeader';
+import { OverviewCard } from '@/shared/components/OverviewCard';
 
 export default function Home() {
   const initializeTracker = () => {
@@ -42,7 +47,7 @@ export default function Home() {
         strategy="afterInteractive"
         onLoad={initializeTracker}
       />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <main className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto">
