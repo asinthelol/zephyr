@@ -34,12 +34,13 @@ def get_overview(
         stats = AnalyticsService.get_overview_stats(db, start_date, end_date)
         return {
             "metric": "overview",
-            "data": [
-                {"label": "events", "value": stats["total_events"]},
-                {"label": "sessions", "value": stats["total_sessions"]},
-                {"label": "users", "value": stats["total_users"]}
-            ],
-            "total": stats["total_events"],
+            "data": {
+                "unique_users": stats["unique_visitors"],
+                "pageviews": stats["page_views"],
+                "sessions": stats["total_sessions"],
+                "pages_per_session": round(stats["avg_pages_per_session"], 2),
+                "session_duration": round(stats["avg_session_duration"], 2)
+            },
             "start_date": start_date,
             "end_date": end_date
         }
