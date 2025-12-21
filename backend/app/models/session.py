@@ -33,6 +33,9 @@ class Session(Base):
     page_views: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     duration: Mapped[int | None] = mapped_column(Integer, nullable=True)  # Duration in seconds
     
+    entry_page: Mapped[str | None] = mapped_column(String(2048), nullable=True, index=True)
+    exit_page: Mapped[str | None] = mapped_column(String(2048), nullable=True, index=True)
+    
     # Relationships
     user = relationship("User", back_populates="sessions")
     events = relationship("Event", back_populates="session", cascade="all, delete-orphan")

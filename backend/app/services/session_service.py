@@ -16,7 +16,7 @@ class SessionService:
     SESSION_TIMEOUT_MINUTES = 30
     
     @staticmethod
-    def create_session(db: DBSession, session_id: str, user_id: Optional[str] = None, started_at: Optional[datetime] = None) -> SessionModel:
+    def create_session(db: DBSession, session_id: str, user_id: Optional[str] = None, started_at: Optional[datetime] = None, entry_page: Optional[str] = None) -> SessionModel:
         """
         Create a new session
         """
@@ -29,7 +29,8 @@ class SessionService:
             user_id=user_id,
             started_at=started_at,
             last_activity=started_at,
-            page_views=0
+            page_views=0,
+            entry_page=entry_page
         )
         
         db.add(db_session)
@@ -86,7 +87,7 @@ class SessionService:
         return bool(last_activity < timeout_threshold)
     
     @staticmethod
-    def end_session(db: DBSession, session_id: str, ended_at: Optional[datetime] = None) -> Optional[SessionModel]:
+    def end_session(db: DBSession, session_id: str, ended_at: Optional[datetime] = None, exit_page: Optional[str] = None) -> Optional[SessionModel]:
         """
         End a session and calculate duration
         """
@@ -102,6 +103,10 @@ class SessionService:
             ended_at_val = session.ended_at
             if ended_at_val is None:
                 session.ended_at = ended_at
+                
+                # Set exit page if provided
+                if exit_page:
+                    session.exit_page = exit_page
                 
                 # Calculate duration in seconds
                 started_at = session.started_at

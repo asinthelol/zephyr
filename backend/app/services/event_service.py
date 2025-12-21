@@ -127,6 +127,15 @@ class EventService:
             if session:
                 session.last_activity = datetime.now(timezone.utc)
                 session.page_views = (session.page_views or 0) + 1
+                
+                # Set entry page if this is the first page view
+                if session.page_views == 1 and event_data.event_type == "pageview":
+                    session.entry_page = event_data.url
+                
+                # Always update exit page for pageviews (last page viewed)
+                if event_data.event_type == "pageview":
+                    session.exit_page = event_data.url
+                
                 db.commit()
         
         # Update user last seen

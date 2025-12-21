@@ -308,3 +308,122 @@ class AnalyticsService:
             }
             for channel, users, events in results
         ]
+    
+    @staticmethod
+    def get_page_analytics(
+        db: Session,
+        limit: int = 50,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Get comprehensive page analytics including views, unique users, and sessions
+        """
+        
+        # Subquery to count unique sessions per page
+        session_subquery = db.query(
+            Event.url,
+            func.count(distinct(Event.session_id)).label("sessions")
+        ).filter(
+            Event.event_type == "pageview",
+            Event.url.isnot(None)
+        )
+        
+        if start_date:
+            session_subquery = session_subquery.filter(Event.timestamp >= start_date)
+        if end_date:
+            session_subquery = session_subquery.filter(Event.timestamp <= end_date)
+        
+        session_subquery = session_subquery.group_by(Event.url).subquery()
+        
+        # Query for page views and unique users
+        query = db.query(
+            Event.url,
+            func.count(Event.id).label("views"),
+            func.count(distinct(Event.user_id)).label("unique_users"),
+            session_subquery.c.sessions
+        ).filter(
+            Event.event_type == "pageview",
+            Event.url.isnot(None)
+        ).join(
+            session_subquery,
+            Event.url == session_subquery.c.url
+        ).group_by(Event.url, session_subquery.c.sessions).order_by(func.count(Event.id).desc())
+        
+        query = AnalyticsService._apply_date_filters(query, start_date, end_date, Event.timestamp)
+        
+        results = query.limit(limit).all()
+        
+        return [
+            {
+                "url": url,
+                "views": views,
+                "unique_users": unique_users,
+                "sessions": sessions
+            }
+            for url, views, unique_users, sessions in results
+        ]
+    
+    @staticmethod
+    def get_entry_pages(
+        db: Session,
+        limit: int = 10,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Get top entry pages (landing pages) by session count
+        """
+        
+        query = db.query(
+            SessionModel.entry_page,
+            func.count(SessionModel.id).label("sessions"),
+            func.count(distinct(SessionModel.user_id)).label("unique_users")
+        ).filter(
+            SessionModel.entry_page.isnot(None)
+        ).group_by(SessionModel.entry_page).order_by(func.count(SessionModel.id).desc())
+        
+        query = AnalyticsService._apply_date_filters(query, start_date, end_date, SessionModel.started_at)
+        
+        results = query.limit(limit).all()
+        
+        return [
+            {
+                "page": page or "unknown",
+                "sessions": sessions,
+                "unique_users": unique_users
+            }
+            for page, sessions, unique_users in results
+        ]
+    
+    @staticmethod
+    def get_exit_pages(
+        db: Session,
+        limit: int = 10,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Get top exit pages by session count
+        """
+        
+        query = db.query(
+            SessionModel.exit_page,
+            func.count(SessionModel.id).label("sessions"),
+            func.count(distinct(SessionModel.user_id)).label("unique_users")
+        ).filter(
+            SessionModel.exit_page.isnot(None)
+        ).group_by(SessionModel.exit_page).order_by(func.count(SessionModel.id).desc())
+        
+        query = AnalyticsService._apply_date_filters(query, start_date, end_date, SessionModel.started_at)
+        
+        results = query.limit(limit).all()
+        
+        return [
+            {
+                "page": page or "unknown",
+                "sessions": sessions,
+                "unique_users": unique_users
+            }
+            for page, sessions, unique_users in results
+        ]

@@ -25,5 +25,7 @@ class SessionResponse(SessionBase):
     ended_at: Optional[datetime] = None
     page_views: int = Field(0, description="Number of page views in session")
     duration: Optional[int] = Field(None, description="Session duration in seconds")
+    entry_page: Optional[str] = Field(None, description="First page viewed in session")
+    exit_page: Optional[str] = Field(None, description="Last page viewed in session")
     
     model_config = ConfigDict(from_attributes=True)

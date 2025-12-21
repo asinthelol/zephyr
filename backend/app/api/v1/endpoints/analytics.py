@@ -316,3 +316,78 @@ def get_traffic_by_channel(
             status_code=500,
             detail=f"Error getting traffic by channel: {str(e)}"
         )
+
+
+@router.get("/pages/analytics")
+def get_page_analytics(
+    limit: int = Query(50, ge=1, le=100),
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get comprehensive page analytics including views, unique users, and sessions per page
+    """
+    
+    try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
+        pages = AnalyticsService.get_page_analytics(db, limit, start_date, end_date)
+        return {"pages": pages}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting page analytics: {str(e)}"
+        )
+
+
+@router.get("/pages/entry")
+def get_entry_pages(
+    limit: int = Query(10, ge=1, le=100),
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get top entry pages (landing pages) by session count
+    """
+    
+    try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
+        pages = AnalyticsService.get_entry_pages(db, limit, start_date, end_date)
+        return {"pages": pages}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting entry pages: {str(e)}"
+        )
+
+
+@router.get("/pages/exit")
+def get_exit_pages(
+    limit: int = Query(10, ge=1, le=100),
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
+    time_range: Optional[str] = Query(None, description="Preset time range"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get top exit pages by session count
+    """
+    
+    try:
+        if time_range:
+            start_date, end_date = get_time_range(time_range)
+        
+        pages = AnalyticsService.get_exit_pages(db, limit, start_date, end_date)
+        return {"pages": pages}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting exit pages: {str(e)}"
+        )
