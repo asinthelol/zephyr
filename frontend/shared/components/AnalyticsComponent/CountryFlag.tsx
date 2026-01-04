@@ -21,9 +21,10 @@ export function CountryFlag({
     <Image
       src={flagUrl}
       alt={`${countryCode} flag`}
-      width={45.6}
-      height={height}
-      className={`${className} rounded max-w-none`}
+      width={0}
+      height={0}
+      sizes="auto"
+      className={`${className} h-4 w-auto`}
       unoptimized
     />
   );

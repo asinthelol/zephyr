@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
-import { AnalyticsItem } from '@/shared/components/AnalyticsItem';
-import { BrandIcon } from '@/shared/components/BrandIcon';
-import { CountryFlag } from '@/shared/components/CountryFlag';
-import { AnalyticsHeader } from '@/shared/components/AnalyticsHeader';
-import { OverviewCard } from '@/shared/components/OverviewCard';
+import { AnalyticsItem } from '@/shared/components/AnalyticsComponent/AnalyticsItem';
+import { BrandIcon } from '@/shared/components/AnalyticsComponent/BrandIcon';
+import { CountryFlag } from '@/shared/components/AnalyticsComponent/CountryFlag';
+import { AnalyticsHeader } from '@/shared/components/AnalyticsComponent/AnalyticsHeader';
+import { OverviewCard } from '@/shared/components/AnalyticsComponent/OverviewCard';
+import { AnalyticsTabs } from '@/shared/components/AnalyticsComponent/AnalyticsTabs';
+import { AnalyticsCard } from '@/shared/components/AnalyticsComponent/AnalyticsCard';
 
 export default function Home() {
   const initializeTracker = () => {
@@ -48,7 +50,7 @@ export default function Home() {
         onLoad={initializeTracker}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <main className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto">
             {/* Header */}

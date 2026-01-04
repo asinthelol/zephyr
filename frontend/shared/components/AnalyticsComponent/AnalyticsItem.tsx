@@ -36,13 +36,13 @@ export function AnalyticsItem({ icon, label, value, url }: AnalyticsItemProps) {
             className="shrink-0 w-6 h-6 flex items-center justify-center hover:opacity-80 transition-opacity text-text-muted"
             aria-label="Open in new tab"
           >
-            <MdOpenInNew size={24} />
+            <MdOpenInNew size={20} />
           </a>
         )}
       </div>
 
       {/* Right side: Value */}
-      <span className="text-white text-base font-medium leading-[19px] text-right shrink-0">
+      <span className="text-text-primary text-base font-medium leading-[19px] text-right shrink-0">
         {value}
       </span>
     </div>
