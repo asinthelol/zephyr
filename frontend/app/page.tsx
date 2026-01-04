@@ -6,7 +6,7 @@ import { AnalyticsItem } from '@/shared/components/AnalyticsComponent/AnalyticsI
 import { BrandIcon } from '@/shared/components/AnalyticsComponent/BrandIcon';
 import { CountryFlag } from '@/shared/components/AnalyticsComponent/CountryFlag';
 import { AnalyticsHeader } from '@/shared/components/AnalyticsComponent/AnalyticsHeader';
-import { OverviewCard } from '@/shared/components/AnalyticsComponent/OverviewCard';
+import { OverviewCard } from '@/shared/components/OverviewCard/OverviewCard';
 import { AnalyticsTabs } from '@/shared/components/AnalyticsComponent/AnalyticsTabs';
 import { AnalyticsCard } from '@/shared/components/AnalyticsComponent/AnalyticsCard';
 
