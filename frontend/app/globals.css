@@ -6,10 +6,13 @@
   
   /* Analytics colors */
   --card-bg: #222121;
+  --card-bg-dark: #171617;
   --analytics-item-bg: #6C708B;
   --text-primary: #FDFDFD;
   --text-muted: rgba(253, 253, 253, 0.5);
   --positive: #00C951;
+  --border-default: #404040;
+  --border-hover: #505050;
 }
 
 @theme inline {
@@ -20,10 +23,13 @@
   
   /* Custom analytics colors */
   --color-card-bg: var(--card-bg);
+  --color-card-bg-dark: var(--card-bg-dark);
   --color-analytics-item-bg: var(--analytics-item-bg);
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
   --color-positive: var(--positive);
+  --color-border-default: var(--border-default);
+  --color-border-hover: var(--border-hover);
 }
 
 @media (prefers-color-scheme: dark) {

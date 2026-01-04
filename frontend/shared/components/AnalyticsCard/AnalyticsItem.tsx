@@ -1,12 +1,5 @@
-import { ReactNode } from 'react';
 import { MdOpenInNew } from 'react-icons/md';
-
-interface AnalyticsItemProps {
-  icon?: ReactNode;
-  label: string;
-  value: string;
-  url?: string;
-}
+import { AnalyticsItemProps } from './types';
 
 export function AnalyticsItem({ icon, label, value, url }: AnalyticsItemProps) {
   return (

@@ -1,29 +1,10 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState } from 'react';
 import { AnalyticsTabs } from './AnalyticsTabs';
 import { AnalyticsHeader } from './AnalyticsHeader';
 import { AnalyticsItem } from './AnalyticsItem';
-
-interface AnalyticsItemData {
-  icon?: ReactNode;
-  label: string;
-  value: string;
-  url?: string;
-}
-
-interface TabData {
-  items: AnalyticsItemData[];
-  headerLabel?: string;
-}
-
-interface AnalyticsCardProps {
-  tabs: string[];
-  defaultTab?: string;
-  measurementLabel: string;
-  tabData: Record<string, TabData>;
-  onTabChange?: (tab: string) => void;
-}
+import { AnalyticsCardProps } from './types';
 
 export function AnalyticsCard({
   tabs,

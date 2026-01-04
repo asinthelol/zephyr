@@ -2,13 +2,15 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
-import { AnalyticsItem } from '@/shared/components/AnalyticsComponent/AnalyticsItem';
-import { BrandIcon } from '@/shared/components/AnalyticsComponent/BrandIcon';
-import { CountryFlag } from '@/shared/components/AnalyticsComponent/CountryFlag';
-import { AnalyticsHeader } from '@/shared/components/AnalyticsComponent/AnalyticsHeader';
+import { AnalyticsItem } from '@/shared/components/AnalyticsCard/AnalyticsItem';
+import { BrandIcon } from '@/shared/components/AnalyticsCard/BrandIcon';
+import { CountryFlag } from '@/shared/components/AnalyticsCard/CountryFlag';
+import { AnalyticsHeader } from '@/shared/components/AnalyticsCard/AnalyticsHeader';
 import { OverviewCard } from '@/shared/components/OverviewCard/OverviewCard';
-import { AnalyticsTabs } from '@/shared/components/AnalyticsComponent/AnalyticsTabs';
-import { AnalyticsCard } from '@/shared/components/AnalyticsComponent/AnalyticsCard';
+import { AnalyticsTabs } from '@/shared/components/AnalyticsCard/AnalyticsTabs';
+import { AnalyticsCard } from '@/shared/components/AnalyticsCard/AnalyticsCard';
+import { CalendarCard } from '@/shared/components/CalendarCard/CalendarCard';
+import { FilterCard } from '@/shared/components/FilterCard/FilterCard';
 
 export default function Home() {
   const initializeTracker = () => {
@@ -49,7 +51,7 @@ export default function Home() {
         strategy="afterInteractive"
         onLoad={initializeTracker}
       />
-
+       
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <main className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto">

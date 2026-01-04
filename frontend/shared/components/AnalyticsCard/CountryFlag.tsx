@@ -1,10 +1,5 @@
 import Image from 'next/image';
-
-interface CountryFlagProps {
-  countryCode: string; // e.g., "us", "gb", "ca"
-  height?: number;
-  className?: string;
-}
+import { CountryFlagProps } from './types';
 
 export function CountryFlag({
   countryCode,

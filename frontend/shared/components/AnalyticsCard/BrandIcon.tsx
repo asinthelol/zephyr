@@ -1,10 +1,5 @@
 import Image from 'next/image';
-
-interface BrandIconProps {
-  domain: string;
-  size?: number;
-  className?: string;
-}
+import { BrandIconProps } from './types';
 
 export function BrandIcon({ domain, size = 24, className = '' }: BrandIconProps) {
   

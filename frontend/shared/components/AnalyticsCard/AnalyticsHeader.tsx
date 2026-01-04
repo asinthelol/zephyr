@@ -1,7 +1,4 @@
-interface AnalyticsHeaderProps {
-  label: string;
-  measurementLabel: string;
-}
+import { AnalyticsHeaderProps } from './types';
 
 export function AnalyticsHeader({ label, measurementLabel }: AnalyticsHeaderProps) {
   return (
