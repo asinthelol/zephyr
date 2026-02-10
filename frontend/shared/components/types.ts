@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface TimeframeOption {
   value: string;
   label: string;
@@ -27,5 +29,30 @@ export const defaultTimeframes: TimeframeOption[] = [
   { value: 'thismonth', label: 'This Month', group: 'period' },
   { value: 'thisyear', label: 'This Year', group: 'period' },
   { value: 'alltime', label: 'All Time', group: 'custom' },
-  { value: 'customrange', label: 'Custom Range', group: 'custom' },
 ];
+
+interface SelectorOption {
+  value: string;
+  label: string;
+  group?: string;
+}
+
+export interface SelectorProps {
+  icon: ReactNode;
+  label?: string;
+  options?: SelectorOption[];
+  selectedValue?: string;
+  onSelect?: (value: string) => void;
+  onClick?: () => void;
+  className?: string;
+  dropdownAlign?: 'left' | 'right';
+}
+
+export interface OverviewCardProps {
+  title: string;
+  value: number;
+  change?: {
+    value: number;
+    timeframe: string;
+  };
+}

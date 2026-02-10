@@ -16,7 +16,7 @@ export function AnalyticsItem({ icon, label, value, url }: AnalyticsItemProps) {
         )}
 
         {/* Label */}
-        <span className="text-text-primary text-base font-medium leading-[19px] truncate">
+        <span className="text-text-primary text-base font-normal leading-[19px] truncate">
           {label}
         </span>
 

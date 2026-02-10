@@ -1,8 +1,17 @@
-export function calendarNavHook(
+export function navTimeframe(
   selectedTimeframe: string,
   currentDate: Date,
   onDateChange?: (date: Date) => void
 ) {
+  // Disable navigation for time-based timeframes and all time
+  const isTimeBasedTimeframe = [
+    'last30min',
+    'last1hour',
+    'last6hours',
+    'last24hours',
+    'alltime',
+  ].includes(selectedTimeframe);
+
   const isAtCurrent = () => {
     const now = new Date();
     const current = new Date(currentDate);
@@ -23,19 +32,29 @@ export function calendarNavHook(
     }
   };
 
-  const canNavigateForward = !isAtCurrent();
+  const canNavigateForward = !isAtCurrent() && !isTimeBasedTimeframe;
+  const canNavigateBackward = !isTimeBasedTimeframe;
 
   const navigate = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
     const factor = direction === 'prev' ? -1 : 1;
 
     switch (selectedTimeframe) {
+      case 'last3days':
+        newDate.setDate(newDate.getDate() + factor * 2);
+        break;
       case 'last7days':
       case 'thisweek':
         newDate.setDate(newDate.getDate() + factor * 7);
         break;
+      case 'last14days':
+        newDate.setDate(newDate.getDate() + factor * 14);
+        break;
       case 'last30days':
         newDate.setDate(newDate.getDate() + factor * 30);
+        break;
+      case 'last60days':
+        newDate.setDate(newDate.getDate() + factor * 60);
         break;
       case 'thismonth':
         newDate.setMonth(newDate.getMonth() + factor);
@@ -44,6 +63,7 @@ export function calendarNavHook(
         newDate.setFullYear(newDate.getFullYear() + factor);
         break;
       default:
+        // For 'today' and time-based, navigate by single days
         newDate.setDate(newDate.getDate() + factor);
     }
 
@@ -52,6 +72,7 @@ export function calendarNavHook(
 
   return {
     canNavigateForward,
+    canNavigateBackward,
     navigatePrevious: () => navigate('prev'),
     navigateNext: () => navigate('next'),
   };

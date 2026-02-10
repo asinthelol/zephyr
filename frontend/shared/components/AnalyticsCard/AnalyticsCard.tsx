@@ -23,7 +23,7 @@ export function AnalyticsCard({
   const currentTabData = tabData[currentTab] || { items: [], headerLabel: currentTab };
 
   return (
-    <div className="w-[612px] h-[480px] bg-card-bg rounded-lg p-4 overflow-y-auto">
+    <div className="w-full h-120 bg-card-bg rounded-lg p-4 overflow-y-auto">
 
       {/* Tabs */}
       <div className="mb-4">

@@ -1,11 +1,6 @@
-interface OverviewCardProps {
-  title: string;
-  value: number;
-  change?: {
-    value: number;
-    label?: string;
-  };
-}
+import { MdArrowDownward, MdArrowUpward } from 'react-icons/md';
+import { OverviewCardProps } from '../types';
+
 
 export function OverviewCard({ title, value, change }: OverviewCardProps) {
   const formatValue = (value: number) => {
@@ -22,31 +17,33 @@ export function OverviewCard({ title, value, change }: OverviewCardProps) {
     : null;
 
   return (
-    <div className="flex flex-col justify-between w-[248px] h-36 bg-card-bg rounded-lg p-4">
+    <div className="flex flex-col justify-between w-full h-24 bg-card-bg rounded-lg p-3">
       
       {/* Title */}
-      <div className="text-text-muted text-[20px] font-medium leading-6">
+      <div className="text-text-muted text-xs font-normal leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
         {title}
       </div>
 
-      {/* Value */}
-      <div className="text-text-primary text-[48px] font-medium leading-[58px]">
-        {formatValue(value)}
-      </div>
-
-      {/* Change indicator */}
-      {change && (
-        <div
-          className={`text-[20px] font-medium leading-6 ${
-            isPositive ? 'text-green-500' : 'text-red-500'
-          }`}
-        >
-          {formattedChange}{' '}
-          <span className="text-text-muted">
-            {change.label || 'vs yesterday'}
-          </span>
+      {/* Value and Change indicator */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-text-primary text-2xl font-medium leading-tight">
+          {formatValue(value)}
         </div>
-      )}
+        {change && (
+          <div className="flex items-center gap-1">
+            {isPositive ? (
+              <MdArrowUpward className="w-4 h-4 text-green-500" />
+            ) : (
+              <MdArrowDownward className="w-4 h-4 text-red-500" />
+            )}
+            <span className={`text-sm font-normal ${
+              isPositive ? 'text-green-500' : 'text-red-500'
+            }`}>
+              {formattedChange}%
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

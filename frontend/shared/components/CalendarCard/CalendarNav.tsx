@@ -6,22 +6,32 @@ interface CalendarNavProps {
   onPrev: () => void;
   onNext: () => void;
   canNavigateForward: boolean;
+  canNavigateBackward?: boolean;
 }
 
 export function CalendarNav({
   onPrev,
   onNext,
   canNavigateForward,
+  canNavigateBackward = true,
 }: CalendarNavProps) {
   return (
     <>
       <button
         onClick={onPrev}
-        className="w-8 h-8 bg-card-bg border border-border-default/50 rounded
-                   flex items-center justify-center
-                   hover:border-border-hover transition-colors"
+        disabled={!canNavigateBackward}
+        className={`w-8 h-8 border border-border-default/50 rounded
+                    flex items-center justify-center transition-colors
+          ${canNavigateBackward
+            ? 'bg-card-bg hover:border-border-hover cursor-pointer'
+            : 'bg-card-bg-dark cursor-not-allowed'}
+        `}
       >
-        <MdKeyboardArrowLeft className="w-6 h-6 text-text-primary" />
+        <MdKeyboardArrowLeft
+          className={`w-6 h-6 ${
+            canNavigateBackward ? 'text-text-primary' : 'text-text-muted'
+          }`}
+        />
       </button>
 
       <button

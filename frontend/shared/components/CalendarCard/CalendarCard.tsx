@@ -1,60 +1,77 @@
 'use client';
 
 import { useState } from 'react';
+import { MdCalendarToday } from 'react-icons/md';
 import {
   CalendarCardProps,
   defaultTimeframes,
-} from './types';
-import { CalendarButton } from './CalendarButton';
-import { CalendarDropdown } from './CalendarDropdown';
+} from '../types';
+import { Selector } from '../Selector/Selector';
 import { CalendarNav } from './CalendarNav';
-import { calendarNavHook } from './calendarNavHook';
+import { navTimeframe } from './lib/index';
+import { getDisplayLabel } from './lib/index';
 
 export function CalendarCard({
-  selectedTimeframe = 'today',
+  selectedTimeframe,
   timeframes = defaultTimeframes,
   onTimeframeChange,
-  currentDate = new Date(),
+  currentDate,
   onDateChange,
 }: CalendarCardProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalTimeframe, setInternalTimeframe] = useState('today');
+  const [internalDate, setInternalDate] = useState(new Date());
 
-  const selectedOption = timeframes.find(
-    tf => tf.value === selectedTimeframe
-  );
+  const timeframe = selectedTimeframe ?? internalTimeframe;
+  const date = currentDate ?? internalDate;
+
+  const displayLabel = getDisplayLabel(timeframe, date, timeframes);
+
+  const setTimeframe = (value: string) => {
+    const today = new Date();
+
+    if (selectedTimeframe === undefined) {
+      setInternalTimeframe(value);
+    }
+
+    if (currentDate === undefined) {
+      setInternalDate(today);
+    }
+
+    onTimeframeChange?.(value);
+    onDateChange?.(today);
+  };
+
+  const setDate = (newDate: Date) => {
+    if (currentDate === undefined) {
+      setInternalDate(newDate);
+    }
+
+    onDateChange?.(newDate);
+  };
 
   const {
     canNavigateForward,
+    canNavigateBackward,
     navigatePrevious,
     navigateNext,
-  } = calendarNavHook(
-    selectedTimeframe,
-    currentDate,
-    onDateChange
-  );
+  } = navTimeframe(timeframe, date, setDate);
 
   return (
     <div className="flex items-center gap-2">
-      <div className="relative">
-        <CalendarButton
-          label={selectedOption?.label || 'Today'}
-          isOpen={isOpen}
-          onClick={() => setIsOpen(v => !v)}
-        />
-
-        <CalendarDropdown
-          isOpen={isOpen}
-          options={timeframes}
-          selectedValue={selectedTimeframe}
-          onSelect={value => onTimeframeChange?.(value)}
-          onClose={() => setIsOpen(false)}
-        />
-      </div>
+      <Selector
+        icon={<MdCalendarToday className="w-4 h-4 text-text-primary" />}
+        label={displayLabel}
+        options={timeframes}
+        selectedValue={timeframe}
+        onSelect={setTimeframe}
+        className="min-w-40"
+      />
 
       <CalendarNav
         onPrev={navigatePrevious}
         onNext={navigateNext}
         canNavigateForward={canNavigateForward}
+        canNavigateBackward={canNavigateBackward}
       />
     </div>
   );

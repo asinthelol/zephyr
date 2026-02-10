@@ -20,7 +20,7 @@ export interface AnalyticsTabsProps {
 
 export interface AnalyticsItemProps {
   icon?: ReactNode;
-  label: string;
+  label: ReactNode;
   value: string;
   url?: string;
 }
@@ -32,7 +32,7 @@ export interface AnalyticsHeaderProps {
 
 export interface AnalyticsItemData {
   icon?: ReactNode;
-  label: string;
+  label: ReactNode;
   value: string;
   url?: string;
 }
