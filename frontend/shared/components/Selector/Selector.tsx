@@ -12,7 +12,8 @@ export function Selector({
   onSelect,
   onClick, 
   className = '',
-  dropdownAlign = 'right'
+  dropdownAlign = 'right',
+  useDynamicLabel = false // Default to false to respect provided label
 }: SelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,12 +30,16 @@ export function Selector({
     setIsOpen(false);
   };
 
-  // Get display label - use selected option's label if available, otherwise use prop label
+  // Get display label
   const getDisplayLabel = (): string => {
-    if (options && selectedValue) {
+
+    // If useDynamicLabel is true, derive from selected option
+    if (useDynamicLabel && options && selectedValue) {
       const selectedOption = options.find(opt => opt.value === selectedValue);
       return selectedOption?.label || labelProp || '';
     }
+    
+    // Otherwise, use the provided label prop
     return labelProp || '';
   };
 

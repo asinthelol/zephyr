@@ -46,6 +46,7 @@ export interface SelectorProps {
   onClick?: () => void;
   className?: string;
   dropdownAlign?: 'left' | 'right';
+  useDynamicLabel?: boolean;
 }
 
 export interface OverviewCardProps {
