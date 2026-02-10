@@ -3,9 +3,11 @@
 import { Selector } from '@/shared/components/Selector/Selector';
 import { useState } from 'react';
 import { MdSchedule } from "react-icons/md";
+import { useAppSelector } from '@/store/hooks';
 
 
 export function GraphSection() {
+  const selectedCard = useAppSelector((state) => state.overview.selectedCard);
 
   // Sample data
   const maxValue = 7000;
@@ -35,7 +37,7 @@ export function GraphSection() {
   return (
     <div className="bg-card-bg rounded-lg p-10 mb-6 h-120 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-text-primary text-lg font-medium">Unique Users</h3>
+        <h3 className="text-text-primary text-lg font-medium">{selectedCard}</h3>
         <Selector
           icon={
             <MdSchedule className="w-4 h-4 text-text-primary" />

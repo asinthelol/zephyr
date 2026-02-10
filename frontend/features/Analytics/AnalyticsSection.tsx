@@ -4,8 +4,11 @@ import { AnalyticsCard } from '@/shared/components/AnalyticsCard/AnalyticsCard';
 import { BrandIcon } from '@/shared/components/AnalyticsCard/BrandIcon';
 import { CountryFlag } from '@/shared/components/AnalyticsCard/CountryFlag';
 import { MdOpenInNew, MdSearch, MdLink, MdPeople, MdKeyboardArrowRight, MdLaptop, MdPhoneIphone } from 'react-icons/md';
+import { useAppSelector } from '@/store/hooks';
 
 export function AnalyticsSection() {
+  const selectedCard = useAppSelector((state) => state.overview.selectedCard);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       
@@ -13,7 +16,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Referrers', 'Channels']}
         defaultTab="Referrers"
-        measurementLabel="Unique Users"
+        measurementLabel={selectedCard}
         tabData={{
           Referrers: {
             items: [
@@ -70,7 +73,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Pages', 'Titles', 'Entries', 'Exits']}
         defaultTab="Pages"
-        measurementLabel="Unique Users"
+        measurementLabel={selectedCard}
         tabData={{
           Pages: {
             items: [
@@ -107,7 +110,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Browsers', 'Devices', 'Operating Systems', 'Screen Dimensions']}
         defaultTab="Browsers"
-        measurementLabel="Unique Users"
+        measurementLabel={selectedCard}
         tabData={{
           Browsers: {
             items: [
@@ -161,7 +164,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Countries', 'Cities', 'Timezones']}
         defaultTab="Countries"
-        measurementLabel="Unique Users"
+        measurementLabel={selectedCard}
         tabData={{
           Countries: {
             items: [
