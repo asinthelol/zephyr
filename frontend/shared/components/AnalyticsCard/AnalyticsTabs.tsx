@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnalyticsTabsProps } from './types';
+import { AnalyticsTabsProps } from '@/shared/components/types';
 
 export function AnalyticsTabs({ tabs, onTabChange, defaultTab }: AnalyticsTabsProps) {
   const [activeTab, setActiveTab] = useState<string>(defaultTab || tabs[0]);

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { BrandIconProps } from './types';
+import { BrandIconProps } from '@/shared/components/types';
 
 export function BrandIcon({ domain, size = 24, className = '' }: BrandIconProps) {
   

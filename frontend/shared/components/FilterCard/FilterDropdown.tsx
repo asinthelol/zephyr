@@ -1,6 +1,6 @@
 'use client';
 
-import { FilterOption } from './types';
+import { FilterOption } from '@/shared/components/types';
 
 interface FilterDropdownProps {
   isOpen: boolean;

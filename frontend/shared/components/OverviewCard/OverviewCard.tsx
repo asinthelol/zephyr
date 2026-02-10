@@ -1,19 +1,14 @@
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md';
-import { OverviewCardProps } from '../types';
+import { OverviewCardProps } from '@/shared/components/types';
+import { formatValue } from '@/shared/lib';
 
 
 export function OverviewCard({ title, value, change }: OverviewCardProps) {
-  const formatValue = (value: number) => {
-    if (value >= 1000) {
-      return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}K`;
-    }
-    return value.toString();
-  };
 
   const isPositive = change ? change.value > 0 : false;
 
   const formattedChange = change
-    ? `${isPositive ? '+' : ''}${change.value}`
+    ? `${isPositive ? '+' : ''}${formatValue(change.value)}`
     : null;
 
   return (

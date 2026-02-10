@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FilterButton } from './FilterButton';
 import { FilterDropdown } from './FilterDropdown';
-import { FilterCardProps } from './types';
+import { FilterCardProps } from '@/shared/components/types';
 
 export function FilterCard({
   icon,

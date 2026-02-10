@@ -56,3 +56,67 @@ export interface OverviewCardProps {
     timeframe: string;
   };
 }
+
+export interface CountryFlagProps {
+  countryCode: string; // e.g., "us", "gb", "ca"
+  height?: number;
+  className?: string;
+}
+
+export interface BrandIconProps {
+  domain: string;
+  size?: number;
+  className?: string;
+}
+
+export interface AnalyticsTabsProps {
+  tabs: string[];
+  onTabChange?: (tab: string) => void;
+  defaultTab?: string;
+}
+
+export interface AnalyticsItemProps {
+  icon?: ReactNode;
+  label: ReactNode;
+  value: number;
+  url?: string;
+  percentage?: number; // For background fill, value between 0 and 100
+}
+
+export interface AnalyticsHeaderProps {
+  label: string;
+  measurementLabel: string;
+}
+
+export interface AnalyticsItemData {
+  icon?: ReactNode;
+  label: ReactNode;
+  value: number;
+  url?: string;
+}
+
+export interface TabData {
+  items: AnalyticsItemData[];
+  headerLabel?: string;
+}
+
+export interface AnalyticsCardProps {
+  tabs: string[];
+  defaultTab?: string;
+  measurementLabel: string;
+  tabData: Record<string, TabData>;
+  onTabChange?: (tab: string) => void;
+}
+
+export interface FilterOption {
+  value: string;
+  label: string;
+  icon?: ReactNode;
+}
+
+export interface FilterCardProps {
+  icon: ReactNode;
+  selectedValue: string;
+  options: FilterOption[];
+  onSelect?: (value: string) => void;
+}

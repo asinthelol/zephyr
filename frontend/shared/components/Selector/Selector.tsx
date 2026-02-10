@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import { MdKeyboardArrowDown, MdCheck } from "react-icons/md";
-import { SelectorProps } from '../types';
+import { SelectorProps } from '@/shared/components/types';
 
 export function Selector({ 
   icon, 

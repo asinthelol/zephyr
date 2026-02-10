@@ -1,4 +1,4 @@
-import { AnalyticsHeaderProps } from './types';
+import { AnalyticsHeaderProps } from '@/shared/components/types';
 
 export function AnalyticsHeader({ label, measurementLabel }: AnalyticsHeaderProps) {
   return (
