@@ -55,6 +55,8 @@ export interface OverviewCardProps {
     value: number;
     timeframe: string;
   };
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
 export interface CountryFlagProps {

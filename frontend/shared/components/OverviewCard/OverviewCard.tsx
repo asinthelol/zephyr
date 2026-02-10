@@ -3,7 +3,7 @@ import { OverviewCardProps } from '@/shared/components/types';
 import { formatValue } from '@/shared/lib';
 
 
-export function OverviewCard({ title, value, change }: OverviewCardProps) {
+export function OverviewCard({ title, value, change, isSelected = false, onClick }: OverviewCardProps) {
 
   const isPositive = change ? change.value > 0 : false;
 
@@ -12,7 +12,12 @@ export function OverviewCard({ title, value, change }: OverviewCardProps) {
     : null;
 
   return (
-    <div className="flex flex-col justify-between w-full h-24 bg-card-bg rounded-lg p-3">
+    <div 
+      className={`flex flex-col justify-between w-full h-24 rounded-lg p-3 cursor-pointer transition-colors hover:border-border-hover border border-border-default ${
+        isSelected ? 'bg-card-bg ' : 'bg-dark'
+      }`}
+      onClick={onClick}
+    >
       
       {/* Title */}
       <div className="text-text-muted text-xs font-normal leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
