@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Script from 'next/script';
 import { DashboardHeader } from '@/features/Overview/DashboardHeader/DashboardHeader';
 import { OverviewSection } from '@/features/Overview/OverviewSection';
-import { GraphSection } from '@/features/Overview/Graph/GraphSection';
+import { GraphSection } from '@/features/Overview/GraphSection/GraphSection';
 import { AnalyticsSection } from '@/features/Analytics/AnalyticsSection';
 
 export default function Home() {

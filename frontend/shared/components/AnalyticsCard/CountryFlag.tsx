@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { CountryFlagProps } from './types';
+import { CountryFlagProps } from '@/shared/components/types';
 
 export function CountryFlag({
   countryCode,

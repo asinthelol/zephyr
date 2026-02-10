@@ -123,3 +123,12 @@ export interface FilterCardProps {
   options: FilterOption[];
   onSelect?: (value: string) => void;
 }
+
+export interface GraphDataPoint {
+  timestamp: string; // e.g., "00:00", "Jan 1", "2024-01-01"
+  value: number;
+}
+
+export interface GraphProps {
+  data?: GraphDataPoint[]; // Optional data from backend (im using dummy data for now)
+}
