@@ -1,14 +1,14 @@
 import { MdArrowDownward, MdArrowUpward } from 'react-icons/md';
 import { OverviewCardProps } from '@/shared/components/types';
-import { formatValue } from '@/shared/lib';
+import { formatDisplayValue } from '@/shared/lib/formatValue';
 
 
-export function OverviewCard({ title, value, change, isSelected = false, onClick }: OverviewCardProps) {
+export function OverviewCard({ title, value, change, isSelected = false, onClick, isPercentage }: OverviewCardProps) {
 
   const isPositive = change ? change.value > 0 : false;
 
   const formattedChange = change
-    ? `${isPositive ? '+' : ''}${formatValue(change.value)}`
+    ? `${isPositive ? '+' : ''}${formatDisplayValue(change.value, title, isPercentage)}`
     : null;
 
   return (
@@ -27,7 +27,7 @@ export function OverviewCard({ title, value, change, isSelected = false, onClick
       {/* Value and Change indicator */}
       <div className="flex items-center justify-between gap-2">
         <div className="text-text-primary text-2xl font-medium leading-tight">
-          {formatValue(value)}
+          {formatDisplayValue(value, title, isPercentage)}
         </div>
         {change && (
           <div className="flex items-center gap-1">
@@ -39,7 +39,7 @@ export function OverviewCard({ title, value, change, isSelected = false, onClick
             <span className={`text-sm font-normal ${
               isPositive ? 'text-green-500' : 'text-red-500'
             }`}>
-              {formattedChange}%
+              {formattedChange}
             </span>
           </div>
         )}

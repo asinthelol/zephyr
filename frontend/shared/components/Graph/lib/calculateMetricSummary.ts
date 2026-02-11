@@ -13,9 +13,9 @@ export function calculateMetricSummary(data: GraphDataPoint[]): MetricSummary {
   const total = data.reduce((sum, point) => sum + point.value, 0);
 
   // calculate average
-  const average = total / data.length;
+  const average = data.reduce((sum, d) => sum + d.value, 0) / data.length;
 
-  // calculate change (percentage change from first to last data point)
+  // calculate percentage change from first to last data point
   const firstValue = data[0].value;
   const lastValue = data[data.length - 1].value;
   const change = firstValue === 0 ? 0 : ((lastValue - firstValue) / firstValue) * 100;

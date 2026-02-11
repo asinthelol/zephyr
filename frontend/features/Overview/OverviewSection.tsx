@@ -62,21 +62,22 @@ export function OverviewSection() {
       />
       <OverviewCard
         title="Pages per Session"
-        value={metricSummaries['Pages per Session'].total}
+        value={metricSummaries['Pages per Session'].average}
         change={{ value: 5.3, timeframe: 'vs yesterday' }}
         isSelected={selectedCard === 'Pages per Session'}
         onClick={() => handleCardClick('Pages per Session')}
       />
       <OverviewCard
         title="Bounce Rate"
-        value={metricSummaries['Bounce Rate'].total}
+        value={metricSummaries['Bounce Rate'].average}
         change={{ value: 5.3, timeframe: 'vs yesterday' }}
         isSelected={selectedCard === 'Bounce Rate'}
+        isPercentage={true}
         onClick={() => handleCardClick('Bounce Rate')}
       />
       <OverviewCard
         title="Session Duration"
-        value={metricSummaries['Session Duration'].total}
+        value={metricSummaries['Session Duration'].average}
         change={{ value: 5.3, timeframe: 'vs yesterday' }}
         isSelected={selectedCard === 'Session Duration'}
         onClick={() => handleCardClick('Session Duration')}

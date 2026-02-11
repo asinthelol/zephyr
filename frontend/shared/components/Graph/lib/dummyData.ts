@@ -3,7 +3,7 @@ import { OverviewCardType } from '@/store/slices/overviewSlice';
 
 export function generateDummyData(metric?: OverviewCardType, timeframe: string = 'hour'): GraphDataPoint[] {
   const baseValue = getBaseValueForMetric(metric);
-  const variance = baseValue * 0.3; // 30% variance
+  const variance = getVarianceForMetric(metric, baseValue);
 
   // Determine number of data points and label format based on timeframe
   let dataPoints: number;
@@ -37,10 +37,24 @@ export function generateDummyData(metric?: OverviewCardType, timeframe: string =
       break;
   }
 
-  return Array.from({ length: dataPoints }, (_, i) => ({
-    timestamp: labelFormat(i),
-    value: Math.floor(Math.random() * variance + baseValue - variance / 2),
-  }));
+  return Array.from({ length: dataPoints }, (_, i) => {
+    let value = Math.floor(Math.random() * variance + baseValue - variance / 2);
+    
+    // Ensure bounce rate stays between 0-100
+    if (metric === 'Bounce Rate') {
+      value = Math.max(0, Math.min(100, value));
+    }
+    
+    // Ensure session duration stays positive
+    if (metric === 'Session Duration') {
+      value = Math.max(30, value); // minimum 30 seconds
+    }
+    
+    return {
+      timestamp: labelFormat(i),
+      value,
+    };
+  });
 }
 
 function getBaseValueForMetric(metric?: OverviewCardType): number {
@@ -76,4 +90,15 @@ export function generateAllMetricsData(timeframe: string = 'hour'): Record<Overv
     acc[metric] = generateDummyData(metric, timeframe);
     return acc;
   }, {} as Record<OverviewCardType, GraphDataPoint[]>);
+}
+
+function getVarianceForMetric(metric?: OverviewCardType, baseValue?: number): number {
+  switch (metric) {
+    case 'Bounce Rate':
+      return 20; // variance of ±20% for bounce rate (so range is ~25-65%)
+    case 'Session Duration':
+      return 60; // variance of ±60 seconds
+    default:
+      return (baseValue || 1000) * 0.3; // 30% variance for others
+  }
 }

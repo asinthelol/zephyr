@@ -57,6 +57,7 @@ export interface OverviewCardProps {
     timeframe: string;
   };
   isSelected?: boolean;
+  isPercentage?: boolean;
   onClick?: () => void;
 }
 
