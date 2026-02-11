@@ -59,6 +59,7 @@ export function AnalyticsCard({
                 value={item.value}
                 url={item.url}
                 percentage={percentage}
+                metric={measurementLabel}
               />
             );
           })}

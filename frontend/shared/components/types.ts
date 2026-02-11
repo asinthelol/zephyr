@@ -86,6 +86,7 @@ export interface AnalyticsItemProps {
   value: number;
   url?: string;
   percentage?: number; // For background fill, value between 0 and 100
+  metric?: string; // For formatting purposes ("Bounce Rate", "Session Duration")
 }
 
 export interface AnalyticsHeaderProps {

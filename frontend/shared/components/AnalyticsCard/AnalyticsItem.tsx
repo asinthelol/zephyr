@@ -1,8 +1,9 @@
 import { MdOpenInNew } from 'react-icons/md';
 import { AnalyticsItemProps } from '@/shared/components/types';
 import { formatValue } from '@/shared/lib';
+import { formatDisplayValue } from '@/shared/lib/formatValue';
 
-export function AnalyticsItem({ icon, label, value, url, percentage }: AnalyticsItemProps) {
+export function AnalyticsItem({ icon, label, value, url, percentage, metric }: AnalyticsItemProps) {
   return (
     <div className="relative w-full h-8 rounded overflow-hidden">
       
@@ -46,7 +47,7 @@ export function AnalyticsItem({ icon, label, value, url, percentage }: Analytics
 
         {/* Right side: Value */}
         <span className="text-text-primary text-base font-medium leading-[19px] text-right shrink-0">
-          {formatValue(value)}
+          {formatDisplayValue(value, metric)}
         </span>
       </div>
     </div>
