@@ -22,7 +22,7 @@ export function Graph({ data }: GraphProps) {
 
   // Generate dummy data
   // replace with like = {somebackendApiCall}
-  const allMetricsData = useMemo(() => generateAllMetricsData(), []);
+  const allMetricsData = useMemo(() => generateAllMetricsData(internalTimeframe), [internalTimeframe]);
 
   const graphData = data ?? allMetricsData[selectedCard];
   const chartData = createChartData(selectedCard, graphData);
