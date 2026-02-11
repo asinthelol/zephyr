@@ -39,7 +39,8 @@ def get_overview(
                 "pageviews": stats["page_views"],
                 "sessions": stats["total_sessions"],
                 "pages_per_session": round(stats["avg_pages_per_session"], 2),
-                "session_duration": round(stats["avg_session_duration"], 2)
+                "session_duration": round(stats["avg_session_duration"], 2),
+                "bounce_rate": round(stats["bounce_rate"], 2)
             },
             "start_date": start_date,
             "end_date": end_date

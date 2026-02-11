@@ -71,6 +71,12 @@ class AnalyticsService:
         ).filter(SessionModel.page_views > 0).scalar()
         avg_pages_per_session = float(avg_pages_result) if avg_pages_result else 0
         
+        # Bounce rate 
+        bounce_rate = 0.0
+        if total_sessions > 0:
+            bounced_sessions = session_query.filter(SessionModel.page_views <= 1).count()
+            bounce_rate = (bounced_sessions / total_sessions) * 100
+        
         return {
             "total_events": total_events,
             "total_sessions": total_sessions,
@@ -79,6 +85,7 @@ class AnalyticsService:
             "page_views": page_views,
             "avg_session_duration": avg_session_duration,
             "avg_pages_per_session": avg_pages_per_session,
+            "bounce_rate": bounce_rate,
         }
     
     @staticmethod
