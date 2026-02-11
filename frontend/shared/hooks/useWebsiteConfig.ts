@@ -23,9 +23,15 @@ export function useWebsiteConfig() {
   }, []);
 
   const saveConfig = (newConfig: WebsiteConfig) => {
-    setConfig(newConfig);
+    const finalConfig: WebsiteConfig = {
+      useDummyData: newConfig.useDummyData,
+      domain: newConfig.useDummyData ? 'example.com' : (newConfig.domain || 'example.com'),
+      apiKey: newConfig.useDummyData ? '' : (newConfig.apiKey || ''),
+    };
+
+    setConfig(finalConfig);
     setIsSetupComplete(true);
-    localStorage.setItem('websiteConfig', JSON.stringify(newConfig));
+    localStorage.setItem('websiteConfig', JSON.stringify(finalConfig));
   }
 
   const resetConfig = () => {

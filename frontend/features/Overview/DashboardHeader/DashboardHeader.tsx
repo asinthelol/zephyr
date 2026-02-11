@@ -3,13 +3,26 @@
 import { CalendarCard } from '@/shared/components/CalendarCard/CalendarCard';
 import { Selector } from '@/shared/components/Selector/Selector';
 import { useWebsiteConfig } from '@/shared/hooks/useWebsiteConfig';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdLanguage } from "react-icons/md";
 
 export function DashboardHeader() {
   const { config, getCurrentDomain } = useWebsiteConfig();
-  const [selectedDomain, setSelectedDomain] = useState(getCurrentDomain());
+  const [currentDomain, setCurrentDomain] = useState('example.com');
+  const [isDemo, setIsDemo] = useState(true);
 
+  useEffect(() => {
+    if (config) {
+      const domain = getCurrentDomain();
+      if (domain) {
+        setCurrentDomain(domain);
+      }
+      setIsDemo(config.useDummyData);
+    }
+  }, [config, getCurrentDomain]);
+
+
+  // here because i dont want dropdown menu on selector to look dumb
   const websiteOptions = config?.useDummyData
     ? [
         { value: 'example.com', label: 'example.com (Demo)' },
@@ -26,10 +39,10 @@ export function DashboardHeader() {
         {/* Domain Selector */}
         <Selector
           icon={<MdLanguage className="w-4 h-4 text-text-primary" />}
-          label={selectedDomain}
+          label={isDemo ? `${currentDomain} (Demo)` : currentDomain}
           options={websiteOptions}
-          selectedValue={selectedDomain}
-          onSelect={setSelectedDomain}
+          selectedValue={currentDomain}
+          onSelect={() => {}}
           dropdownAlign="left"
           className="min-w-48"
           useDynamicLabel
