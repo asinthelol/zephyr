@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { DashboardHeader } from '@/features/Overview/DashboardHeader/DashboardHeader';
 import { OverviewSection } from '@/features/Overview/OverviewSection';
 import { GraphSection } from '@/features/Overview/GraphSection/GraphSection';
 import { AnalyticsSection } from '@/features/Analytics/AnalyticsSection';
+import { useWebsiteConfig } from '@/shared/hooks/useWebsiteConfig';
+import { WebsiteConfig } from '@/shared/components/types';
+import { SetupModal } from '@/shared/components/SetupModal/SetupModal';
 
 export default function Home() {
-  const [domain, setDomain] = useState('kevintolbert.dev');
+  const { config, isSetupComplete, saveConfig } = useWebsiteConfig();
+  const [showSetup, setShowSetup] = useState(false);
 
   const initializeTracker = () => {
     if (typeof window !== 'undefined' && (window as any).ZephyrTracker) {
@@ -27,17 +31,33 @@ export default function Home() {
     }
   };
 
+
+
+  useEffect(() => {
+    // Show setup modal if no config exists
+    if (!isSetupComplete) {
+      setShowSetup(true);
+    }
+  }, [isSetupComplete]);
+
+  const handleSetupComplete = (setupConfig: WebsiteConfig) => {
+    saveConfig(setupConfig);
+    setShowSetup(false);
+  };
+
   return (
     <>
-      <Script 
+      <Script
         src="/zephyr-tracker.min.js" 
         strategy="afterInteractive"
         onLoad={initializeTracker}
       />
        
-      <div className="min-h-screen bg-[#1a1a1a]">
+       <SetupModal isOpen={showSetup} onClose={handleSetupComplete} />
+
+      <div className="min-h-screen bg-background">
         <main className="container mx-auto px-6 py-6">
-          <DashboardHeader domain={domain} onDomainChange={setDomain} />
+          <DashboardHeader />
           <OverviewSection />
           <GraphSection />
           <AnalyticsSection />

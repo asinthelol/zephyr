@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useWebsiteConfig } from '../hooks/useWebsiteConfig';
 
 export interface TimeframeOption {
   value: string;
@@ -138,4 +139,15 @@ export interface MetricSummary {
   total: number;
   change: number;
   average: number;
+}
+
+export interface WebsiteConfig {
+  useDummyData: boolean;
+  apiKey?: string;
+  domain?: string;
+}
+
+export interface SetupModalProps {
+  isOpen: boolean;
+  onClose: (config: WebsiteConfig) => void;
 }
