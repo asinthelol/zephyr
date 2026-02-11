@@ -132,3 +132,9 @@ export interface GraphDataPoint {
 export interface GraphProps {
   data?: GraphDataPoint[]; // Optional data from backend (im using dummy data for now)
 }
+
+export interface MetricSummary {
+  total: number;
+  change: number;
+  average: number;
+}

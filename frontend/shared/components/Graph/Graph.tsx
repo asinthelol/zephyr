@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { MdSchedule } from 'react-icons/md';
 
 import { Selector } from '@/shared/components/Selector/Selector';
 import { useAppSelector } from '@/store/hooks';
 
-import './chartSetup';
+import './lib/chartSetup';
 import { GraphProps } from '@/shared/components/types';
-import { generateDummyData } from './dummyData';
-import { createChartData } from './chartConfig';
-import { lineChartOptions } from './chartOptions';
+import { generateAllMetricsData, generateDummyData } from './lib/dummyData';
+import { createChartData } from './lib/chartConfig';
+import { lineChartOptions } from './lib/chartOptions';
 
 export function Graph({ data }: GraphProps) {
   const selectedCard = useAppSelector(
@@ -20,7 +20,11 @@ export function Graph({ data }: GraphProps) {
 
   const [internalTimeframe, setInternalTimeframe] = useState('hour');
 
-  const graphData = data ?? generateDummyData();
+  // Generate dummy data
+  // replace with like = {somebackendApiCall}
+  const allMetricsData = useMemo(() => generateAllMetricsData(), []);
+
+  const graphData = data ?? allMetricsData[selectedCard];
   const chartData = createChartData(selectedCard, graphData);
 
   return (

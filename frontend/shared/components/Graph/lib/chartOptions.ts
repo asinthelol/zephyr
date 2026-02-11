@@ -46,6 +46,7 @@ export const lineChartOptions: ChartOptions<'line'> = {
         maxRotation: 0,
         autoSkip: true,
         autoSkipPadding: 20,
+        padding: 16,
       },
       border: { display: false },
     },
@@ -61,6 +62,7 @@ export const lineChartOptions: ChartOptions<'line'> = {
           const num = typeof value === 'number' ? value : 0;
           return num >= 1000 ? `${(num / 1000).toFixed(0)}K` : num.toString();
         },
+        padding: 16,
       },
       border: { display: false },
     },
