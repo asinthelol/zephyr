@@ -3,14 +3,35 @@
 import { AnalyticsCard } from '@/shared/components/AnalyticsCard/AnalyticsCard';
 import { useAppSelector } from '@/store/hooks';
 import { generateAllAnalyticsData } from '@/shared/components/AnalyticsCard/lib/generators';
-import { useMemo } from 'react';
+import { generateAllMetricsData } from '@/shared/components/Graph/lib/dummyData';
+import { calculateMetricSummary } from '@/shared/components/Graph/lib/calculateMetricSummary';
+import { useState, useEffect, useMemo } from 'react';
 
 export function AnalyticsSection() {
   const selectedCard = useAppSelector((state) => state.overview.selectedCard);
+  const calendarDate = useAppSelector((state) => state.calendar.selectedDate);
+  const calendarTimeframe = useAppSelector((state) => state.calendar.selectedTimeframe);
+  const [isClient, setIsClient] = useState(false);
 
   // generate dummy data
-  // replace with like = {somebackendApiCall}
-  const analyticsData = useMemo(() => generateAllAnalyticsData(), []);
+  const sessionsTotal = useMemo(() => {
+    if (!isClient) return 0;
+    const metricsData = generateAllMetricsData('hour', calendarTimeframe, new Date(calendarDate));
+    return calculateMetricSummary(metricsData['Sessions']).total;
+  }, [isClient, calendarDate, calendarTimeframe]);
+  
+  const analyticsData = useMemo(() => {
+    if (!isClient) return null;
+    return generateAllAnalyticsData(sessionsTotal);
+  }, [isClient, sessionsTotal]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!analyticsData) {
+    return <div className="h-64" />; // Placeholder during SSR
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -19,7 +40,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Referrers', 'Channels']}
         defaultTab="Referrers"
-        measurementLabel={selectedCard}
+        measurementLabel="Sessions"
         tabData={{
           Referrers: {
            items: analyticsData.Referrers,
@@ -36,7 +57,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Pages', 'Titles', 'Entries', 'Exits']}
         defaultTab="Pages"
-        measurementLabel={selectedCard}
+        measurementLabel="Sessions"
         tabData={{
           Pages: {
             items: analyticsData.Pages,
@@ -61,7 +82,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Browsers', 'Devices', 'Operating Systems', 'Screen Dimensions']}
         defaultTab="Browsers"
-        measurementLabel={selectedCard}
+        measurementLabel="Sessions"
         tabData={{
           Browsers: {
             items: analyticsData.Browsers,
@@ -86,7 +107,7 @@ export function AnalyticsSection() {
       <AnalyticsCard
         tabs={['Countries', 'Cities', 'Timezones']}
         defaultTab="Countries"
-        measurementLabel={selectedCard}
+        measurementLabel="Sessions"
         tabData={{
           Countries: {
             items: analyticsData.Countries,

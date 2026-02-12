@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { MdSchedule } from 'react-icons/md';
 
@@ -9,7 +9,7 @@ import { useAppSelector } from '@/store/hooks';
 
 import './lib/chartSetup';
 import { GraphProps } from '@/shared/components/types';
-import { generateAllMetricsData, generateDummyData } from './lib/dummyData';
+import { generateAllMetricsData } from './lib/dummyData';
 import { createChartData } from './lib/chartConfig';
 import { lineChartOptions } from './lib/chartOptions';
 
@@ -17,12 +17,26 @@ export function Graph({ data }: GraphProps) {
   const selectedCard = useAppSelector(
     (state) => state.overview.selectedCard
   );
+  const calendarDate = useAppSelector((state) => state.calendar.selectedDate);
+  const calendarTimeframe = useAppSelector((state) => state.calendar.selectedTimeframe);
 
   const [internalTimeframe, setInternalTimeframe] = useState('hour');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Generate dummy data
   // replace with like = {somebackendApiCall}
-  const allMetricsData = useMemo(() => generateAllMetricsData(internalTimeframe), [internalTimeframe]);
+  const allMetricsData = useMemo(() => {
+    if (!isClient) return null;
+    return generateAllMetricsData(internalTimeframe, calendarTimeframe, new Date(calendarDate));
+  }, [internalTimeframe, isClient, calendarDate, calendarTimeframe]);
+
+  if (!allMetricsData) {
+    return <div className="h-120" />; // Placeholder during SSR
+  }
 
   const graphData = data ?? allMetricsData[selectedCard];
   const chartData = createChartData(selectedCard, graphData);

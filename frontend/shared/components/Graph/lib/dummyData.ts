@@ -1,60 +1,178 @@
 import { GraphDataPoint } from '@/shared/components/types';
 import { OverviewCardType } from '@/store/slices/overviewSlice';
 
-export function generateDummyData(metric?: OverviewCardType, timeframe: string = 'hour'): GraphDataPoint[] {
+
+export function generateDummyData(
+  metric?: OverviewCardType,
+  timeframe: string = 'hour',
+  calendarTimeframe: string = 'today',
+  anchorDate: Date = new Date()
+): GraphDataPoint[] {
   const baseValue = getBaseValueForMetric(metric);
   const variance = getVarianceForMetric(metric, baseValue);
 
-  // Determine number of data points and label format based on timeframe
-  let dataPoints: number;
-  let labelFormat: (index: number) => string;
+  // Figure out the date range from the calendar timeframe + anchor
+  const { start, end } = getDateRange(calendarTimeframe, anchorDate);
 
+  // Calculate interval in ms and total data points
+  let intervalMs: number;
   switch (timeframe) {
     case '5min':
-      dataPoints = 12 * 24; // 12 * 5 * 24 = 1440 minutes (24 hours)
-      labelFormat = (i) => {
-        const minutes = i * 5;
-        const hour = Math.floor(minutes / 60);
-        const min = minutes % 60;
-        return `${hour}:${min.toString().padStart(2, '0')}`;
-      };
+      intervalMs = 5 * 60 * 1000;
       break;
-
     case '15min':
-      dataPoints = 4 * 24; // 4 * 15 * 24 = 1440 minutes
-      labelFormat = (i) => {
-        const minutes = i * 15;
-        const hour = Math.floor(minutes / 60);
-        const min = minutes % 60;
-        return `${hour}:${min.toString().padStart(2, '0')}`;
-      };
+      intervalMs = 15 * 60 * 1000;
       break;
-
     case 'hour':
     default:
-      dataPoints = 24; // 24 hours
-      labelFormat = (i) => `${i}:00`;
+      intervalMs = 60 * 60 * 1000;
       break;
   }
 
-  return Array.from({ length: dataPoints }, (_, i) => {
-    let value = Math.floor(Math.random() * variance + baseValue - variance / 2);
-    
-    // Ensure bounce rate stays between 0-100
-    if (metric === 'Bounce Rate') {
-      value = Math.max(0, Math.min(100, value));
+  const totalMs = end.getTime() - start.getTime();
+  const dataPoints = Math.max(1, Math.ceil(totalMs / intervalMs));
+
+  // Determine if we should show dates in labels (multi-day range)
+  const spanDays = totalMs / (1000 * 60 * 60 * 24);
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const formatTimestamp = (date: Date, index: number, prevDate: Date | null): string => {
+    const hour = date.getHours();
+    const min = date.getMinutes().toString().padStart(2, '0');
+
+    if (spanDays <= 1) {
+      // show hours like 0:00, 1:00, ...
+      return `${hour}:${min}`;
     }
-    
-    // Ensure session duration stays positive
+
+    // show date label when the day changes
+    const isNewDay = !prevDate || date.getDate() !== prevDate.getDate();
+    if (isNewDay) {
+      return `${monthNames[date.getMonth()]} ${date.getDate()}`;
+    }
+    return '';
+  };
+
+  // the same date always produces the same data
+  const seed = simpleHash(`${metric}-${start.toISOString()}`);
+
+  return Array.from({ length: dataPoints }, (_, i) => {
+    const pointDate = new Date(start.getTime() + i * intervalMs);
+    const prevDate = i > 0 ? new Date(start.getTime() + (i - 1) * intervalMs) : null;
+
+    // somewhat random value per datapoint
+    const pointSeed = seed + i * 2654435761;
+    const rand = ((Math.sin(pointSeed) * 10000) % 1 + 1) % 1; // 0..1
+    let value = Math.floor(rand * variance + baseValue - variance / 2);
+
+    if (metric === 'Bounce Rate') {
+      value = Math.max(0, Math.min(10, value));
+    }
     if (metric === 'Session Duration') {
       value = Math.max(30, value); // minimum 30 seconds
     }
-    
+
     return {
-      timestamp: labelFormat(i),
+      timestamp: formatTimestamp(pointDate, i, prevDate),
       value,
     };
   });
+}
+
+// compute start/end dates for a given calendar timeframe anchored to a date
+function getDateRange(calendarTimeframe: string, anchor: Date): { start: Date; end: Date } {
+  const d = new Date(anchor);
+  d.setHours(0, 0, 0, 0);
+
+  switch (calendarTimeframe) {
+    case 'today': {
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start: d, end };
+    }
+    case 'last3days': {
+      const start = new Date(d);
+      start.setDate(start.getDate() - 2);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'last7days':
+    case 'thisweek': {
+      const start = new Date(d);
+      start.setDate(start.getDate() - 6);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'last14days': {
+      const start = new Date(d);
+      start.setDate(start.getDate() - 13);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'last30days': {
+      const start = new Date(d);
+      start.setDate(start.getDate() - 29);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'last60days': {
+      const start = new Date(d);
+      start.setDate(start.getDate() - 59);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'thismonth': {
+      const start = new Date(d.getFullYear(), d.getMonth(), 1);
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'thisyear': {
+      const start = new Date(d.getFullYear(), 0, 1);
+      const end = new Date(d.getFullYear(), 11, 31, 23, 59, 59, 999);
+      return { start, end };
+    }
+    case 'last30min':
+    case 'last1hour':
+    case 'last6hours':
+    case 'last24hours': {
+      const now = new Date();
+      const hoursMap: Record<string, number> = {
+        last30min: 0.5,
+        last1hour: 1,
+        last6hours: 6,
+        last24hours: 24,
+      };
+      const hours = hoursMap[calendarTimeframe] ?? 24;
+      const start = new Date(now.getTime() - hours * 60 * 60 * 1000);
+      return { start, end: now };
+    }
+    default: {
+      
+      // default to last 30 days
+      const start = new Date(d);
+      start.setDate(start.getDate() - 29);
+      const end = new Date(d);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+  }
+}
+
+// for deterministic pseudo-random data
+function simpleHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0;
+  }
+  return Math.abs(hash);
 }
 
 function getBaseValueForMetric(metric?: OverviewCardType): number {
@@ -76,7 +194,11 @@ function getBaseValueForMetric(metric?: OverviewCardType): number {
   }
 }
 
-export function generateAllMetricsData(timeframe: string = 'hour'): Record<OverviewCardType, GraphDataPoint[]> {
+export function generateAllMetricsData(
+  timeframe: string = 'hour',
+  calendarTimeframe: string = 'today',
+  anchorDate: Date = new Date()
+): Record<OverviewCardType, GraphDataPoint[]> {
   const metrics: OverviewCardType[] = [
     'Unique Users',
     'Pageviews',
@@ -87,7 +209,7 @@ export function generateAllMetricsData(timeframe: string = 'hour'): Record<Overv
   ];
 
   return metrics.reduce((acc, metric) => {
-    acc[metric] = generateDummyData(metric, timeframe);
+    acc[metric] = generateDummyData(metric, timeframe, calendarTimeframe, anchorDate);
     return acc;
   }, {} as Record<OverviewCardType, GraphDataPoint[]>);
 }

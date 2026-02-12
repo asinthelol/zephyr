@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { MdCalendarToday } from 'react-icons/md';
 import {
   CalendarCardProps,
@@ -10,6 +9,8 @@ import { Selector } from '../Selector/Selector';
 import { CalendarNav } from './CalendarNav';
 import { navTimeframe } from './lib/index';
 import { getDisplayLabel } from './lib/index';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setSelectedDate, setSelectedTimeframe } from '@/store/slices/calendarSlice';
 
 export function CalendarCard({
   selectedTimeframe,
@@ -18,34 +19,27 @@ export function CalendarCard({
   currentDate,
   onDateChange,
 }: CalendarCardProps) {
-  const [internalTimeframe, setInternalTimeframe] = useState('today');
-  const [internalDate, setInternalDate] = useState(new Date());
+  const dispatch = useAppDispatch();
+  const calendarDate = useAppSelector((state) => state.calendar.selectedDate);
+  const calendarTimeframe = useAppSelector((state) => state.calendar.selectedTimeframe);
 
-  const timeframe = selectedTimeframe ?? internalTimeframe;
-  const date = currentDate ?? internalDate;
+  const timeframe = selectedTimeframe ?? calendarTimeframe;
+  const date = currentDate ?? new Date(calendarDate);
 
   const displayLabel = getDisplayLabel(timeframe, date, timeframes);
 
   const setTimeframe = (value: string) => {
     const today = new Date();
 
-    if (selectedTimeframe === undefined) {
-      setInternalTimeframe(value);
-    }
-
-    if (currentDate === undefined) {
-      setInternalDate(today);
-    }
+    dispatch(setSelectedTimeframe(value));
+    dispatch(setSelectedDate(today.toISOString()));
 
     onTimeframeChange?.(value);
     onDateChange?.(today);
   };
 
   const setDate = (newDate: Date) => {
-    if (currentDate === undefined) {
-      setInternalDate(newDate);
-    }
-
+    dispatch(setSelectedDate(newDate.toISOString()));
     onDateChange?.(newDate);
   };
 

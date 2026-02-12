@@ -8,7 +8,7 @@ export function OverviewCard({ title, value, change, isSelected = false, onClick
   const isPositive = change ? change.value > 0 : false;
 
   const formattedChange = change
-    ? `${isPositive ? '+' : ''}${formatDisplayValue(change.value, title, isPercentage)}`
+    ? `${isPositive ? '+' : ''}${change.value.toFixed(1)}%`
     : null;
 
   return (
@@ -27,7 +27,7 @@ export function OverviewCard({ title, value, change, isSelected = false, onClick
       {/* Value and Change indicator */}
       <div className="flex items-center justify-between gap-2">
         <div className="text-text-primary text-2xl font-medium leading-tight">
-          {formatDisplayValue(value, title, isPercentage)}
+          {formatDisplayValue(value, title)}
         </div>
         {change && (
           <div className="flex items-center gap-1">

@@ -14,7 +14,7 @@ export function DashboardHeader() {
   useEffect(() => {
     if (config) {
       const domain = getCurrentDomain();
-      if (domain) {
+      if (domain && domain !== 'localhost') { // avoid showing localhost and only show "example.com"
         setCurrentDomain(domain);
       }
       setIsDemo(config.useDummyData);
@@ -25,7 +25,7 @@ export function DashboardHeader() {
   // here because i dont want dropdown menu on selector to look dumb
   const websiteOptions = config?.useDummyData
     ? [
-        { value: 'example.com', label: 'example.com (Demo)' },
+        { value: 'example.com', label: 'example.com' },
       ]
     : [
         { value: config?.domain || 'example.com', label: config?.domain || 'example.com' },
@@ -39,7 +39,7 @@ export function DashboardHeader() {
         {/* Domain Selector */}
         <Selector
           icon={<MdLanguage className="w-4 h-4 text-text-primary" />}
-          label={isDemo ? `${currentDomain} (Demo)` : currentDomain}
+          label={isDemo ? `${currentDomain}` : currentDomain}
           options={websiteOptions}
           selectedValue={currentDomain}
           onSelect={() => {}}

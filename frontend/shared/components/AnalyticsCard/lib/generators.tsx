@@ -237,10 +237,11 @@ export function generateCountriesData(): AnalyticsItemData[] {
 export function generateCitiesData(): AnalyticsItemData[] {
   const cities = [
     { country: 'us', countryName: 'US', city: 'New York', base: 30000 },
-    { country: 'us', countryName: 'US', city: 'Los Angeles', base: 25000 },
-    { country: 'us', countryName: 'US', city: 'Chicago', base: 18000 },
-    { country: 'gb', countryName: 'UK', city: 'London', base: 35000 },
-    { country: 'ca', countryName: 'CA', city: 'Toronto', base: 20000 },
+    { country: 'gb', countryName: 'UK', city: 'London', base: 25000 },
+    { country: 'au', countryName: 'AU', city: 'Sydney', base: 18000 },
+    { country: 'ca', countryName: 'CA', city: 'Toronto', base: 35000 },
+    { country: 'de', countryName: 'DE', city: 'Berlin', base: 20000 },
+    { country: 'jp', countryName: 'JP', city: 'Tokyo', base: 15000 },
   ];
 
   return cities
@@ -277,8 +278,8 @@ export function generateTimezonesData(): AnalyticsItemData[] {
     .sort((a, b) => b.value - a.value);
 }
 
-export function generateAllAnalyticsData() {
-  return {
+export function generateAllAnalyticsData(totalSessions: number = 800) {
+  const raw = {
     Referrers: generateReferrersData(),
     Channels: generateChannelsData(),
     Pages: generatePagesData(),
@@ -293,4 +294,18 @@ export function generateAllAnalyticsData() {
     Cities: generateCitiesData(),
     Timezones: generateTimezonesData(),
   };
+
+  // scale each category so its items sum to totalSessions
+  const scaleItems = (items: AnalyticsItemData[]): AnalyticsItemData[] => {
+    const rawTotal = items.reduce((sum, item) => sum + item.value, 0);
+    if (rawTotal === 0) return items;
+    return items.map(item => ({
+      ...item,
+      value: Math.round((item.value / rawTotal) * totalSessions),
+    }));
+  };
+
+  return Object.fromEntries(
+    Object.entries(raw).map(([key, items]) => [key, scaleItems(items)])
+  ) as typeof raw;
 }
