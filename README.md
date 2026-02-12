@@ -7,7 +7,7 @@
 1. Clone the repo
 
 ```bash
-git clone https://github.com/Zelp/zephyr.git
+git clone https://github.com/asinthelol/zephyr.git
 cd zephyr
 ```
 
