@@ -55,4 +55,4 @@ I don't care what you do with it, just don't say you made this.
 
 ---
 
-### by Zelp
+### by asinthelol
