@@ -46,8 +46,8 @@ Frontend runs on [http://localhost:3000](http://localhost:3000)
 ## Built With
 
 - **Frontend**: Next.js, React, TypeScript, Tailwind
-- **Backend**: Python, SQLAlchemy, FastAPI, Alembic (NOT USED)
-- **Analytics**: Custom event tracking system       (NOT USED)
+- **Backend**: Python, SQLAlchemy, FastAPI, Alembic (NOT ENABLED)
+- **Analytics**: Custom event tracking system       (NOT ENABLED)
 
 ## License
 
