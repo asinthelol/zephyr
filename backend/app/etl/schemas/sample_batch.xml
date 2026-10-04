@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventBatch xmlns="urn:zephyr:canonical:event:v1" batchId="batch-0001" schemaVersion="1">
+  <event>
+    <eventId>3f6c1a9e-0b1d-4c55-9a43-6d1f7a2b8e10</eventId>
+    <eventType>pageview</eventType>
+    <timestamp>2026-10-04T14:32:10Z</timestamp>
+    <sessionId>sess_abc123</sessionId>
+    <userId>user_42</userId>
+    <url>https://example.com/pricing</url>
+    <referrer>https://www.google.com/</referrer>
+    <userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36</userAgent>
+    <viewport>
+      <width>1440</width>
+      <height>900</height>
+    </viewport>
+    <channel>organic_search</channel>
+    <metadata>
+      <entry key="language">en-US</entry>
+      <entry key="timezone">America/Chicago</entry>
+    </metadata>
+  </event>
+</eventBatch>

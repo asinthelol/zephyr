@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Zephyr canonical event model, v1.
+  Every tracker event is transformed into this shape and validated against
+  this schema before it is loaded into the database.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:z="urn:zephyr:canonical:event:v1"
+           targetNamespace="urn:zephyr:canonical:event:v1"
+           elementFormDefault="qualified">
+
+  <xs:simpleType name="EventType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+      <xs:pattern value="[a-z][a-z0-9_]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Channel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="direct"/>
+      <xs:enumeration value="organic_search"/>
+      <xs:enumeration value="social"/>
+      <xs:enumeration value="referral"/>
+      <xs:enumeration value="unknown"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Url">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="2048"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Identifier">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Pixels">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="20000"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="MetadataEntry">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Metadata">
+    <xs:sequence>
+      <xs:element name="entry" type="z:MetadataEntry" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Viewport">
+    <xs:sequence>
+      <xs:element name="width" type="z:Pixels"/>
+      <xs:element name="height" type="z:Pixels"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Event">
+    <xs:sequence>
+      <xs:element name="eventId" type="z:Identifier"/>
+      <xs:element name="eventType" type="z:EventType"/>
+      <xs:element name="timestamp" type="xs:dateTime"/>
+      <xs:element name="sessionId" type="z:Identifier"/>
+      <xs:element name="userId" type="z:Identifier" minOccurs="0"/>
+      <xs:element name="url" type="z:Url"/>
+      <xs:element name="referrer" type="z:Url" minOccurs="0"/>
+      <xs:element name="userAgent" type="xs:string"/>
+      <xs:element name="viewport" type="z:Viewport" minOccurs="0"/>
+      <xs:element name="channel" type="z:Channel" minOccurs="0"/>
+      <xs:element name="metadata" type="z:Metadata" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="eventBatch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="event" type="z:Event" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="batchId" type="z:Identifier" use="required"/>
+      <xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="1"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
