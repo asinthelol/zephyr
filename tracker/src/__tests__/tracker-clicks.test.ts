@@ -3,10 +3,10 @@
  */
 
 import ZephyrTracker from '../index';
-import { testConfig } from './setup';
+import { testConfig, flushPromises } from './setup';
 
 describe('ZephyrTracker - Click Tracking', () => {
-  it('should set up click tracking when enabled', () => {
+  it('should set up click tracking when enabled', async () => {
     const mockAddEventListener = jest.fn();
     document.addEventListener = mockAddEventListener;
 
@@ -14,11 +14,12 @@ describe('ZephyrTracker - Click Tracking', () => {
       ...testConfig,
       trackClicks: true,
     });
+    await flushPromises();
 
     expect(mockAddEventListener).toHaveBeenCalledWith('click', expect.any(Function));
   });
 
-  it('should not set up click tracking when disabled', () => {
+  it('should not set up click tracking when disabled', async () => {
     const mockAddEventListener = jest.fn();
     document.addEventListener = mockAddEventListener;
 
@@ -26,17 +27,19 @@ describe('ZephyrTracker - Click Tracking', () => {
       ...testConfig,
       trackClicks: false,
     });
+    await flushPromises();
 
     expect(mockAddEventListener).not.toHaveBeenCalledWith('click', expect.any(Function));
   });
 });
 
 describe('ZephyrTracker - Unload Tracking', () => {
-  it('should set up page unload tracking', () => {
+  it('should set up page unload tracking', async () => {
     const mockAddEventListener = jest.fn();
     window.addEventListener = mockAddEventListener;
 
     new ZephyrTracker(testConfig);
+    await flushPromises();
 
     expect(mockAddEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });

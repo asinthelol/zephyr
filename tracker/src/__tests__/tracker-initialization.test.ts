@@ -27,7 +27,7 @@ describe('ZephyrTracker - Initialization', () => {
   });
 
   it('should initialize session on construction', () => {
-    const mockInitSession = jest.fn().mockReturnValue('sess_123');
+    const mockInitSession = jest.fn().mockReturnValue({ sessionId: 'sess_123', isNew: true });
     (SessionManager as jest.Mock).mockImplementation(() => ({
       initSession: mockInitSession,
       getSessionId: jest.fn(),
@@ -70,7 +70,7 @@ describe('ZephyrTracker - Initialization', () => {
     const mockGetSessionId = jest.fn().mockReturnValue('sess_123');
 
     (SessionManager as jest.Mock).mockImplementation(() => ({
-      initSession: jest.fn().mockReturnValue('sess_123'),
+      initSession: jest.fn().mockReturnValue({ sessionId: 'sess_123', isNew: true }),
       getSessionId: mockGetSessionId,
       updateExpiry: jest.fn(),
       createSessionData: mockCreateSessionData,

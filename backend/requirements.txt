@@ -18,3 +18,6 @@ python-multipart
 
 # Utilities
 user-agents
+
+# XML Validation
+lxml

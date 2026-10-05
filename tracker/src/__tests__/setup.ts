@@ -74,7 +74,7 @@ beforeEach(() => {
 
   // Setup default mock implementations
   (SessionManager as jest.Mock).mockImplementation(() => ({
-    initSession: jest.fn().mockReturnValue('sess_123'),
+    initSession: jest.fn().mockReturnValue({ sessionId: 'sess_123', isNew: true }),
     getSessionId: jest.fn().mockReturnValue('sess_123'),
     updateExpiry: jest.fn(),
     endSession: jest.fn(),
@@ -101,6 +101,9 @@ beforeEach(() => {
     trackPageUnload: jest.fn(),
   }));
 });
+
+/** Let the tracker's async init() finish before asserting */
+export const flushPromises = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 export const testConfig = {
   apiUrl: 'https://api.example.com',

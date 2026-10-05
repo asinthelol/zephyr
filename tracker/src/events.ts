@@ -3,27 +3,51 @@
  * Handles event creation and transmission to the backend
  */
 
+import { DataCollector } from './collector';
+import { generateUUID } from './utils';
+
 export interface EventData {
+  event_id: string;
   event_type: string;
   url: string;
   referrer?: string;
   user_agent: string;
+  timestamp: string;
   viewport_width?: number;
   viewport_height?: number;
+  screen_width?: number;
+  screen_height?: number;
+  language?: string;
+  timezone?: string;
+  platform?: string;
   event_metadata?: Record<string, unknown>;
   session_id: string;
   user_id?: string;
 }
 
+export interface BatchConfig {
+  batchSize: number;
+  // Flush this long after the first queued event (ms)
+  flushInterval: number;
+  maxQueueSize: number;
+}
+
+const ENVELOPE_SCHEMA_VERSION = '1';
+
 export class EventTracker {
   private apiUrl: string;
   private apiKey: string;
   private debug: boolean;
+  private batch: BatchConfig;
+  private queue: EventData[] = [];
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private flushing = false;
 
-  constructor(apiUrl: string, apiKey: string, debug = false) {
+  constructor(apiUrl: string, apiKey: string, debug = false, batch: Partial<BatchConfig> = {}) {
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
     this.debug = debug;
+    this.batch = { batchSize: 10, flushInterval: 5000, maxQueueSize: 500, ...batch };
   }
 
   /**
@@ -35,19 +59,7 @@ export class EventTracker {
     userId?: string,
     metadata?: Record<string, unknown>
   ): Promise<void> {
-    const eventData: EventData = {
-      event_type: eventType,
-      url: window.location.href,
-      referrer: document.referrer || undefined,
-      user_agent: navigator.userAgent,
-      viewport_width: window.innerWidth,
-      viewport_height: window.innerHeight,
-      event_metadata: metadata,
-      session_id: sessionId,
-      user_id: userId,
-    };
-
-    await this.sendEvent(eventData);
+    this.enqueue(this.buildEvent(eventType, sessionId, userId, metadata));
   }
 
   /**
@@ -112,55 +124,121 @@ export class EventTracker {
    * Track page unload
    */
   public trackPageUnload(sessionId: string, userId?: string): void {
-    if (!navigator.sendBeacon) {
-      this.log('sendBeacon not supported');
-      return;
-    }
+    this.enqueue(this.buildEvent('page_unload', sessionId, userId), false);
 
-    const eventData: EventData = {
-      event_type: 'page_unload',
-      url: window.location.href,
-      user_agent: navigator.userAgent,
-      session_id: sessionId,
-      user_id: userId,
-    };
-
-    const url = `${this.apiUrl}/events/`;
-    const blob = new Blob([JSON.stringify(eventData)], { type: 'application/json' });
-
-    // Maybe add API key to headers via workaround (sendBeacon doesn't support custom headers)
-    // Consider using a query parameter or implementing on server side
-    // this --> `${this.apiUrl}/events/?api_key=${this.apiKey}` wouldn't work due to CORS and security concerns
-    navigator.sendBeacon(url, blob);
-    this.log('Page unload tracked via sendBeacon');
+    // sendBeacon cannot set the X-API-Key header, so flush with a keepalive fetch instead
+    void this.flush();
+    this.log('Page unload queued and flushed');
   }
 
   /**
-   * Send event data to backend
+   * Send all queued events to the ingest endpoint as one batch
+   *
+   * On a network error or 5xx the events are put back on the queue to retry on
+   * the next flush (the backend de-duplicates on event_id). On a 4xx they are
+   * dropped, since resending the same payload cannot succeed.
    */
-  private async sendEvent(eventData: EventData): Promise<void> {
-    const url = `${this.apiUrl}/events/`;
+  public async flush(): Promise<void> {
+    this.clearFlushTimer();
+    if (this.flushing || this.queue.length === 0) return;
+
+    this.flushing = true;
+    const events = this.queue.splice(0, this.queue.length);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`${this.apiUrl}/ingest/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-API-Key': this.apiKey,
         },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify({
+          schema_version: ENVELOPE_SCHEMA_VERSION,
+          sent_at: new Date().toISOString(),
+          events,
+        }),
         keepalive: true, // Keep connection alive for page unload scenarios
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      if (response.ok) {
+        this.log('Flushed', events.length, 'events', await response.json());
+      } else if (response.status >= 500) {
+        this.requeue(events);
+        this.log('Server error, will retry:', response.status);
+      } else {
+        this.log('Batch rejected, dropping:', response.status, await response.text());
       }
-
-      this.log('Event tracked successfully:', eventData.event_type);
     } catch (error) {
-      this.log('Error tracking event:', error);
-      throw error;
+      this.requeue(events);
+      this.log('Error flushing events, will retry:', error);
+    } finally {
+      this.flushing = false;
+    }
+  }
+
+  /**
+   * Build an event with its key and collected browser data
+   */
+  private buildEvent(
+    eventType: string,
+    sessionId: string,
+    userId?: string,
+    metadata?: Record<string, unknown>
+  ): EventData {
+    const page = DataCollector.collectPageData();
+
+    return {
+      event_id: generateUUID(),
+      event_type: eventType,
+      url: page.url,
+      referrer: page.referrer,
+      user_agent: page.userAgent,
+      timestamp: new Date().toISOString(),
+      viewport_width: page.viewportWidth,
+      viewport_height: page.viewportHeight,
+      screen_width: page.screenWidth,
+      screen_height: page.screenHeight,
+      language: page.language,
+      timezone: page.timezone,
+      platform: page.platform,
+      event_metadata: metadata,
+      session_id: sessionId,
+      user_id: userId,
+    };
+  }
+
+  /**
+   * Queue an event; flush when the batch is full, otherwise on a timer
+   */
+  private enqueue(eventData: EventData, schedule = true): void {
+    this.queue.push(eventData);
+    if (this.queue.length > this.batch.maxQueueSize) {
+      this.queue.splice(0, this.queue.length - this.batch.maxQueueSize);
+    }
+
+    if (this.queue.length >= this.batch.batchSize) {
+      void this.flush();
+    } else if (schedule && !this.flushTimer) {
+      this.flushTimer = setTimeout(() => void this.flush(), this.batch.flushInterval);
+    }
+  }
+
+  private requeue(events: EventData[]): void {
+    this.queue.unshift(...events);
+    if (this.queue.length > this.batch.maxQueueSize) {
+      this.queue.splice(0, this.queue.length - this.batch.maxQueueSize);
+    }
+
+    // Retry later even if no further events arrive
+    if (!this.flushTimer) {
+      this.flushTimer = setTimeout(() => void this.flush(), this.batch.flushInterval);
+    }
+  }
+
+  private clearFlushTimer(): void {
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
     }
   }
 

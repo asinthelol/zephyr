@@ -4,7 +4,7 @@ API v1 Router - Aggregates all v1 endpoints
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import events, sessions, users, analytics, api_keys, time_ranges
+from app.api.v1.endpoints import events, sessions, users, analytics, api_keys, time_ranges, ingest
 
 api_router = APIRouter()
 
@@ -42,4 +42,10 @@ api_router.include_router(
     time_ranges.router,
     prefix="/time-ranges",
     tags=["time-ranges"]
+)
+
+api_router.include_router(
+    ingest.router,
+    prefix="/ingest",
+    tags=["ingest"]
 )

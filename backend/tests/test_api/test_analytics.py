@@ -9,31 +9,34 @@ def test_get_analytics_overview(client, sample_user_data, sample_session_data, s
     """Test getting analytics overview"""
     
     # Create test data
-    client.post("/api/users/", json=sample_user_data)
-    client.post("/api/sessions/", json=sample_session_data)
-    client.post("/api/events/", json=sample_event_data)
+    client.post("/api/v1/users/", json=sample_user_data)
+    client.post("/api/v1/sessions/", json=sample_session_data)
+    client.post("/api/v1/events/", json=sample_event_data)
     
     # Get overview
-    response = client.get("/api/analytics/overview")
+    response = client.get("/api/v1/analytics/overview")
     assert response.status_code == 200
     data = response.json()
     assert data["metric"] == "overview"
-    assert len(data["data"]) == 3  # events, sessions, users
-    assert data["total"] >= 1  # At least 1 event created
+    assert set(data["data"]) == {
+        "unique_users", "pageviews", "sessions",
+        "pages_per_session", "session_duration", "bounce_rate",
+    }
+    assert data["data"]["pageviews"] >= 1  # At least 1 event created
 
 
 def test_get_events_analytics(client, sample_user_data, sample_session_data, sample_event_data):
     """Test getting events analytics"""
     
     # Create test data
-    client.post("/api/users/", json=sample_user_data)
-    client.post("/api/sessions/", json=sample_session_data)
-    event_response = client.post("/api/events/", json=sample_event_data)
+    client.post("/api/v1/users/", json=sample_user_data)
+    client.post("/api/v1/sessions/", json=sample_session_data)
+    event_response = client.post("/api/v1/events/", json=sample_event_data)
     print(f"Event creation response: {event_response.status_code}, {event_response.json()}")
     assert event_response.status_code == 201, f"Failed to create event: {event_response.json()}"
     
     # Get events analytics
-    response = client.get("/api/analytics/events")
+    response = client.get("/api/v1/analytics/events")
     assert response.status_code == 200
     data = response.json()
     assert data["metric"] == "events"
@@ -44,11 +47,11 @@ def test_get_sessions_analytics(client, sample_user_data, sample_session_data):
     """Test getting sessions analytics"""
     
     # Create test data
-    client.post("/api/users/", json=sample_user_data)
-    client.post("/api/sessions/", json=sample_session_data)
+    client.post("/api/v1/users/", json=sample_user_data)
+    client.post("/api/v1/sessions/", json=sample_session_data)
     
     # Get sessions analytics
-    response = client.get("/api/analytics/sessions")
+    response = client.get("/api/v1/analytics/sessions")
     assert response.status_code == 200
     data = response.json()
     assert data["metric"] == "sessions"
@@ -60,13 +63,13 @@ def test_analytics_with_date_range(client, sample_user_data, sample_session_data
     """Test analytics with date range filtering"""
     
     # Create test data
-    client.post("/api/users/", json=sample_user_data)
-    client.post("/api/sessions/", json=sample_session_data)
-    client.post("/api/events/", json=sample_event_data)
+    client.post("/api/v1/users/", json=sample_user_data)
+    client.post("/api/v1/sessions/", json=sample_session_data)
+    client.post("/api/v1/events/", json=sample_event_data)
     
     # Get analytics with date range
     response = client.get(
-        "/api/analytics/overview?start_date=2025-11-01T00:00:00Z&end_date=2025-11-30T23:59:59Z"
+        "/api/v1/analytics/overview?start_date=2025-11-01T00:00:00Z&end_date=2025-11-30T23:59:59Z"
     )
     assert response.status_code == 200
     data = response.json()

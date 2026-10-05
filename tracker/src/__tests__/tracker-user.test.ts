@@ -29,7 +29,7 @@ describe('ZephyrTracker - User Management', () => {
     const mockGetSessionId = jest.fn().mockReturnValue('sess_456');
 
     (SessionManager as jest.Mock).mockImplementation(() => ({
-      initSession: jest.fn().mockReturnValue('sess_456'),
+      initSession: jest.fn().mockReturnValue({ sessionId: 'sess_456', isNew: true }),
       getSessionId: mockGetSessionId,
       updateExpiry: jest.fn(),
       endSession: jest.fn(),
