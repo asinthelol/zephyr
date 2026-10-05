@@ -13,7 +13,7 @@
     <xs:restriction base="xs:string">
       <xs:minLength value="1"/>
       <xs:maxLength value="50"/>
-      <xs:pattern value="[a-z][a-z0-9_]*"/>
+      <xs:pattern value="[a-z][a-z0-9_.-]*"/>
     </xs:restriction>
   </xs:simpleType>
 
