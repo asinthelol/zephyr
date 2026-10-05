@@ -11,6 +11,9 @@ class Event(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
+    # Key from the ETL pipeline
+    event_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
+
     event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     url: Mapped[str] = mapped_column(Text, nullable=False)
     referrer: Mapped[str | None] = mapped_column(Text, nullable=True)

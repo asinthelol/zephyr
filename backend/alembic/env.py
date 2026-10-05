@@ -8,7 +8,7 @@ from alembic import context
 # Import app settings and models
 from app.config import settings
 from app.database import Base
-from app.models import Event, Session, User, APIKey
+from app.models import Event, Session, User, APIKey, IngestReject
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
