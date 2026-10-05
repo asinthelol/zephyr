@@ -69,6 +69,7 @@ def client(db_session):
     # Import here to use test database
     from app.main import app as fastapi_app
     from app.database import get_db
+    from app.api.deps import get_db as deps_get_db
     from app.core.security import validate_api_key
     from app.models.api_key import APIKey
     
@@ -91,7 +92,9 @@ def client(db_session):
     async def override_validate_api_key():
         return test_api_key
     
+    # Endpoints depend on app.api.deps.get_db; the API key check uses app.database.get_db
     fastapi_app.dependency_overrides[get_db] = override_get_db
+    fastapi_app.dependency_overrides[deps_get_db] = override_get_db
     fastapi_app.dependency_overrides[validate_api_key] = override_validate_api_key
     
     with TestClient(fastapi_app) as test_client:

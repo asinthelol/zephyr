@@ -34,7 +34,7 @@ describe('ZephyrTracker - Error Handling', () => {
     }));
 
     (SessionManager as jest.Mock).mockImplementation(() => ({
-      initSession: jest.fn().mockReturnValue('sess_123'),
+      initSession: jest.fn().mockReturnValue({ sessionId: 'sess_123', isNew: true }),
       getSessionId: jest.fn().mockReturnValue('sess_123'),
       updateExpiry: jest.fn(),
       endSession: jest.fn(),
